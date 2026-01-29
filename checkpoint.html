@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MINT | Checkpoint Verification</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --mint-navy: #0B0D11;
+            --mint-navy-light: #12151A;
+            --mint-gray: #3B4046;
+            --mint-gray-light: #6B7280;
+            --mint-white: #E5E7EB;
+            --mint-green: #059669;
+            --mint-red: #DC2626;
+            --mint-amber: #D97706;
+            --mint-blue: #007AFF;
+            --surface-base: #0B0D11;
+            --surface-card: #12151A;
+            --surface-elevated: #1A1E25;
+            --border-subtle: rgba(255, 255, 255, 0.06);
+            --border-medium: rgba(255, 255, 255, 0.10);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: var(--surface-base);
+            color: var(--mint-white);
+            min-height: 100vh;
+        }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+
+        /* Navigation Bar */
+        .mint-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 24px;
+            background: var(--surface-card);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+        .mint-nav-left { display: flex; align-items: center; gap: 32px; }
+        .mint-nav-logo { font-size: 15px; font-weight: 600; color: var(--mint-white); letter-spacing: 0.3px; }
+        .mint-nav-tabs { display: flex; gap: 8px; }
+        .nav-tab {
+            padding: 10px 24px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            color: var(--mint-gray-light);
+            background: transparent;
+            border: 1px solid var(--border-subtle);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.15s;
+            text-decoration: none;
+        }
+        .nav-tab:hover { border-color: var(--mint-gray); color: var(--mint-white); }
+        .nav-tab.active { color: var(--mint-white); background: var(--surface-elevated); border-color: var(--mint-white); }
+
+        .nav-right { display: flex; align-items: center; gap: 16px; }
+        .filter-indicator {
+            font-size: 11px;
+            color: var(--mint-blue);
+            font-family: 'JetBrains Mono', monospace;
+            padding: 6px 12px;
+            background: rgba(0, 122, 255, 0.1);
+            border-radius: 4px;
+            display: none;
+        }
+        .filter-indicator.visible { display: block; }
+
+        .execute-btn {
+            padding: 10px 20px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            color: var(--mint-white);
+            background: var(--mint-navy);
+            border: 1px solid var(--mint-gray);
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .execute-btn:hover { background: var(--surface-elevated); }
+        .execute-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* Main Layout: Data Panel Top Right, Log Center, Checkpoints Bottom */
+        .main-container {
+            display: grid;
+            grid-template-rows: auto 1fr;
+            gap: 16px;
+            padding: 16px 24px;
+            height: calc(100vh - 60px);
+        }
+
+        .top-row {
+            display: grid;
+            grid-template-columns: 340px 1fr;
+            gap: 16px;
+            max-height: 320px;
+        }
+
+        .bottom-row {
+            display: grid;
+            grid-template-columns: 1fr;
+            overflow: hidden;
+        }
+
+        /* Data Panel */
+        .data-panel {
+            background: var(--surface-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 4px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .data-panel-header {
+            padding: 10px 14px;
+            background: var(--surface-elevated);
+            border-bottom: 1px solid var(--border-subtle);
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--mint-gray-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .data-panel-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px;
+        }
+        .data-block {
+            background: var(--surface-base);
+            border: 1px solid var(--border-subtle);
+            margin-bottom: 6px;
+            transition: border-color 0.2s;
+        }
+        .data-block.active { border-color: var(--mint-blue); }
+        .data-block-header {
+            padding: 6px 10px;
+            background: var(--surface-elevated);
+            border-bottom: 1px solid var(--border-subtle);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .data-block-title { font-size: 9px; font-weight: 600; color: var(--mint-gray-light); text-transform: uppercase; letter-spacing: 0.5px; }
+        .data-block-type { font-size: 8px; color: var(--mint-gray); font-family: 'JetBrains Mono', monospace; }
+        .data-block-content {
+            padding: 6px 10px;
+            font-size: 9px;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--mint-white);
+            white-space: pre-wrap;
+            word-break: break-all;
+            max-height: 80px;
+            overflow-y: auto;
+            line-height: 1.4;
+        }
+
+        /* Execution Log */
+        .log-panel {
+            background: var(--surface-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 4px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .log-panel-header {
+            padding: 10px 14px;
+            background: var(--surface-elevated);
+            border-bottom: 1px solid var(--border-subtle);
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--mint-gray-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .log-content {
+            flex: 1;
+            background: #0a0c0f;
+            padding: 12px;
+            overflow-y: auto;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            line-height: 1.6;
+        }
+        .log-entry { margin-bottom: 2px; }
+        .log-time { color: var(--mint-gray); }
+        .log-system { color: #64748B; }
+        .log-query { color: #3B82F6; }
+        .log-response { color: #10B981; }
+        .log-checkpoint { color: #8B5CF6; }
+        .log-calc { color: #F59E0B; }
+        .log-error { color: #EF4444; }
+
+        /* Checkpoint Table */
+        .checkpoint-panel {
+            background: var(--surface-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 4px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .checkpoint-header {
+            padding: 10px 14px;
+            background: var(--surface-elevated);
+            border-bottom: 1px solid var(--border-subtle);
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--mint-gray-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .checkpoint-content {
+            flex: 1;
+            overflow-y: auto;
+        }
+        .checkpoint-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .checkpoint-table th {
+            padding: 8px 12px;
+            text-align: left;
+            font-size: 9px;
+            font-weight: 600;
+            color: var(--mint-gray-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: var(--surface-elevated);
+            border-bottom: 1px solid var(--border-subtle);
+            position: sticky;
+            top: 0;
+        }
+        .checkpoint-table td {
+            padding: 8px 12px;
+            font-size: 11px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+        .checkpoint-table tr:hover { background: var(--surface-elevated); }
+        .checkpoint-table tr.pass { background: rgba(5, 150, 105, 0.08); }
+        .checkpoint-table tr.fail { background: rgba(220, 38, 38, 0.08); }
+        .checkpoint-table tr.hold { background: rgba(217, 119, 6, 0.08); }
+
+        .cp-id { font-family: 'JetBrains Mono', monospace; font-weight: 600; color: var(--mint-white); }
+        .cp-name { color: var(--mint-white); }
+        .cp-source { font-size: 10px; color: var(--mint-gray-light); }
+        .cp-domain {
+            font-size: 9px;
+            padding: 2px 8px;
+            border-radius: 2px;
+            font-weight: 500;
+        }
+        .cp-domain.retailer { background: rgba(59, 130, 246, 0.15); color: #60A5FA; }
+        .cp-domain.mint { background: rgba(139, 92, 246, 0.15); color: #A78BFA; }
+        .cp-domain.supplier { background: rgba(16, 185, 129, 0.15); color: #34D399; }
+        .cp-domain.decision { background: rgba(245, 158, 11, 0.15); color: #FBBF24; }
+        .cp-domain.feedback { background: rgba(107, 114, 128, 0.15); color: #9CA3AF; }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 52px;
+            height: 20px;
+            font-size: 9px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        .status-badge.pass { background: var(--mint-green); color: white; }
+        .status-badge.fail { background: var(--mint-red); color: white; }
+        .status-badge.hold { background: var(--mint-amber); color: white; }
+        .status-badge.pending { background: var(--mint-gray); color: var(--mint-gray-light); }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="mint-nav">
+        <div class="mint-nav-left">
+            <div class="mint-nav-logo">MINT</div>
+            <div class="mint-nav-tabs">
+                <a href="tape.html" class="nav-tab">The Tape</a>
+                <a href="checkpoint.html" class="nav-tab active">Checkpoint</a>
+                <a href="agents.html" class="nav-tab">Agents</a>
+            </div>
+        </div>
+        <div class="nav-right">
+            <div class="filter-indicator" id="filterIndicator"></div>
+            <button class="execute-btn" id="executeBtn" onclick="runVerification()">Execute Verification</button>
+        </div>
+    </nav>
+
+    <!-- Main Layout -->
+    <div class="main-container">
+        <!-- Top Row: Data Panel + Log -->
+        <div class="top-row">
+            <!-- Data Panel (moved to top left) -->
+            <div class="data-panel">
+                <div class="data-panel-header">Oracle Data Objects</div>
+                <div class="data-panel-content" id="dataContent">
+                    <div class="data-block" id="dataInvoice">
+                        <div class="data-block-header">
+                            <span class="data-block-title">Invoice (AP Workbench)</span>
+                            <span class="data-block-type">REST</span>
+                        </div>
+                        <div class="data-block-content" id="invoiceData"></div>
+                    </div>
+                    <div class="data-block" id="dataReim">
+                        <div class="data-block-header">
+                            <span class="data-block-title">ReIM Status (IM_DOC_HEAD)</span>
+                            <span class="data-block-type">SQL</span>
+                        </div>
+                        <div class="data-block-content" id="reimData"></div>
+                    </div>
+                    <div class="data-block" id="dataPO">
+                        <div class="data-block-header">
+                            <span class="data-block-title">Purchase Order</span>
+                            <span class="data-block-type">REST</span>
+                        </div>
+                        <div class="data-block-content" id="poData"></div>
+                    </div>
+                    <div class="data-block" id="dataGR">
+                        <div class="data-block-header">
+                            <span class="data-block-title">Goods Receipt</span>
+                            <span class="data-block-type">REST</span>
+                        </div>
+                        <div class="data-block-content" id="grData"></div>
+                    </div>
+                    <div class="data-block" id="dataGraph">
+                        <div class="data-block-header">
+                            <span class="data-block-title">Payor Graph Edge</span>
+                            <span class="data-block-type">Cypher</span>
+                        </div>
+                        <div class="data-block-content" id="graphData"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Execution Log -->
+            <div class="log-panel">
+                <div class="log-panel-header">Execution Log</div>
+                <div class="log-content" id="logContent">
+                    <div class="log-entry log-system">Click "Execute Verification" to begin...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Row: Checkpoint Table -->
+        <div class="bottom-row">
+            <div class="checkpoint-panel">
+                <div class="checkpoint-header">13 Point Verification Status</div>
+                <div class="checkpoint-content">
+                    <table class="checkpoint-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 50px;">CP</th>
+                                <th>Checkpoint</th>
+                                <th style="width: 140px;">Source</th>
+                                <th style="width: 80px;">Domain</th>
+                                <th style="width: 70px;">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="checkpointBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Oracle ERP Response Data
+        const oracleResponses = {
+            invoice: {
+                InvoiceId: 'INV-2024-847291',
+                InvoiceNumber: '847291',
+                InvoiceAmount: 127450.00,
+                InvoiceCurrency: 'USD',
+                InvoiceDate: '2024-01-15',
+                DueDate: '2024-02-14',
+                InvoiceStatus: 'VALIDATED',
+                SupplierId: 'SUP-4421',
+                POReference: 'PO-2024-003847'
+            },
+            reim: {
+                doc_id: 'INV-2024-847291',
+                vendor_id: 'SUP-4421',
+                status: 'MATCHED',
+                total_cost: 127450.00,
+                currency_code: 'USD',
+                match_date: '2024-01-16T14:32:00Z',
+                discrepancy_count: 0
+            },
+            purchaseOrder: {
+                POHeaderId: 'PO-2024-003847',
+                OrderNumber: '003847',
+                Status: 'CLOSED_FOR_RECEIVING',
+                TotalAmount: 130000.00,
+                Currency: 'USD',
+                SupplierId: 'SUP-4421',
+                ApprovalDate: '2024-01-02',
+                ApprovedBy: 'michael.murphy@tjx.com'
+            },
+            goodsReceipt: {
+                ReceiptNumber: 'GR-2024-19847',
+                ReceiptDate: '2024-01-10',
+                ReceiptStatus: 'FULLY_RECEIVED',
+                QuantityReceived: 5000,
+                QuantityOrdered: 5000,
+                ReceivedBy: 'warehouse.tjx@tjx.com'
+            },
+            payorGraph: {
+                first_transaction: '2022-03-15',
+                last_transaction: '2024-01-15',
+                invoice_count: 847,
+                total_volume: 42350000,
+                stated_terms: 30,
+                actual_avg_days: 28.4,
+                std_dev: 3.2,
+                dispute_count: 12,
+                resolution_rate: 0.92,
+                mint_funded_count: 234,
+                outcomes: { on_time: 228, late: 6, default: 0 }
+            }
+        };
+
+        // Checkpoint definitions
+        const checkpoints = [
+            { id: '01', name: 'Invoice Exists', source: 'IM_DOC_HEAD', domain: 'retailer' },
+            { id: '02', name: 'PO Match', source: 'ORDHEAD', domain: 'retailer' },
+            { id: '03', name: 'Goods Receipt', source: 'IM_DOC_HEAD', domain: 'retailer' },
+            { id: '04', name: 'Amount Validation', source: 'Derived', domain: 'retailer' },
+            { id: '05', name: 'Retailer Selection', source: 'MINT UI', domain: 'retailer' },
+            { id: '06', name: 'Duplicate Detection', source: 'MINT DB', domain: 'mint' },
+            { id: '07', name: 'Historical Relationship', source: 'Payor Graph', domain: 'mint' },
+            { id: '08', name: 'Third Party Enrichment', source: 'D&B/OFAC', domain: 'mint' },
+            { id: '09', name: 'KYC/AML', source: 'Identity', domain: 'supplier' },
+            { id: '10', name: 'Bank Account', source: 'Bank API', domain: 'supplier' },
+            { id: '11', name: 'Entity Verification', source: 'SOS', domain: 'supplier' },
+            { id: '12', name: 'Underwriting Verdict', source: 'Agent 03', domain: 'decision' },
+            { id: '13', name: 'Outcome Tracking', source: 'Payment', domain: 'feedback' }
+        ];
+
+        let results = {};
+
+        // Initialize data panels
+        function initDataPanels() {
+            document.getElementById('invoiceData').textContent = JSON.stringify(oracleResponses.invoice, null, 2);
+            document.getElementById('reimData').textContent = JSON.stringify(oracleResponses.reim, null, 2);
+            document.getElementById('poData').textContent = JSON.stringify(oracleResponses.purchaseOrder, null, 2);
+            document.getElementById('grData').textContent = JSON.stringify(oracleResponses.goodsReceipt, null, 2);
+            document.getElementById('graphData').textContent = JSON.stringify(oracleResponses.payorGraph, null, 2);
+        }
+
+        // Initialize checkpoint table
+        function initCheckpointTable() {
+            const tbody = document.getElementById('checkpointBody');
+            tbody.innerHTML = checkpoints.map(cp => `
+                <tr id="cp-row-${cp.id}">
+                    <td class="cp-id">${cp.id}</td>
+                    <td class="cp-name">${cp.name}</td>
+                    <td class="cp-source">${cp.source}</td>
+                    <td><span class="cp-domain ${cp.domain}">${cp.domain.toUpperCase()}</span></td>
+                    <td><span class="status-badge pending" id="status-${cp.id}">···</span></td>
+                </tr>
+            `).join('');
+        }
+
+        // Logging
+        function log(message, type = 'system') {
+            const ts = new Date().toISOString().split('T')[1].substring(0, 12);
+            const logContent = document.getElementById('logContent');
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.innerHTML = `<span class="log-time">[${ts}]</span> <span class="log-${type}">${message}</span>`;
+            logContent.appendChild(entry);
+            logContent.scrollTop = logContent.scrollHeight;
+        }
+
+        // Set data block active
+        function setActiveData(blockId) {
+            document.querySelectorAll('.data-block').forEach(b => b.classList.remove('active'));
+            if (blockId) {
+                const block = document.getElementById('data' + blockId.charAt(0).toUpperCase() + blockId.slice(1));
+                if (block) block.classList.add('active');
+            }
+        }
+
+        // Update checkpoint status
+        function setResult(cpId, status) {
+            results[cpId] = status;
+            const badge = document.getElementById('status-' + cpId);
+            const row = document.getElementById('cp-row-' + cpId);
+            if (badge) {
+                badge.className = 'status-badge ' + status.toLowerCase();
+                badge.textContent = status;
+            }
+            if (row) {
+                row.className = status.toLowerCase();
+            }
+        }
+
+        // Delay helper
+        const delay = ms => new Promise(r => setTimeout(r, ms));
+
+        // Main verification
+        async function runVerification() {
+            document.getElementById('executeBtn').disabled = true;
+            document.getElementById('logContent').innerHTML = '';
+            results = {};
+            initCheckpointTable();
+
+            log('Initializing Oracle ERP connection...', 'system');
+            await delay(200);
+            log('OAuth 2.0 token acquired from IDCS endpoint', 'system');
+            await delay(150);
+            log('Bearer token valid for 3600 seconds', 'system');
+            await delay(300);
+
+            // CP01
+            log('─── CHECKPOINT 01: Invoice Exists ───', 'checkpoint');
+            setActiveData('Invoice');
+            log('GET /fscmRestApi/resources/11.13.18.05/invoices/' + oracleResponses.invoice.InvoiceId, 'query');
+            await delay(400);
+            log('HTTP 200 | InvoiceStatus: VALIDATED', 'response');
+            log('Query IM_DOC_HEAD for ReIM status...', 'query');
+            await delay(350);
+            log("IM_DOC_HEAD.status = 'MATCHED'", 'response');
+            setResult('01', 'PASS');
+            log('CP01 Result: PASS (status ∈ {MATCHED, POSTED})', 'checkpoint');
+            await delay(300);
+
+            // CP02
+            log('─── CHECKPOINT 02: PO Match ───', 'checkpoint');
+            setActiveData('PO');
+            log('GET /fscmRestApi/resources/11.13.18.05/purchaseOrders/' + oracleResponses.purchaseOrder.POHeaderId, 'query');
+            await delay(380);
+            log('HTTP 200 | Status: CLOSED_FOR_RECEIVING', 'response');
+            log('SupplierId: ' + oracleResponses.purchaseOrder.SupplierId, 'response');
+            log('Supplier match: YES', 'calc');
+            setResult('02', 'PASS');
+            log('CP02 Result: PASS', 'checkpoint');
+            await delay(300);
+
+            // CP03
+            log('─── CHECKPOINT 03: Goods Receipt ───', 'checkpoint');
+            setActiveData('GR');
+            log('GET /fscmRestApi/resources/11.13.18.05/receipts?PONumber=003847', 'query');
+            await delay(420);
+            log('HTTP 200 | ReceiptStatus: FULLY_RECEIVED', 'response');
+            log('Quantity: 5000/5000', 'response');
+            setResult('03', 'PASS');
+            log('CP03 Result: PASS (goods receipt confirmed)', 'checkpoint');
+            await delay(300);
+
+            // CP04
+            log('─── CHECKPOINT 04: Amount Validation ───', 'checkpoint');
+            setActiveData('Invoice');
+            log('Invoice Amount: $' + oracleResponses.invoice.InvoiceAmount.toLocaleString(), 'calc');
+            log('PO Amount: $' + oracleResponses.purchaseOrder.TotalAmount.toLocaleString(), 'calc');
+            log('Variance: -1.96% (tolerance: 5%)', 'calc');
+            setResult('04', 'PASS');
+            log('CP04 Result: PASS', 'checkpoint');
+            await delay(300);
+
+            // CP05
+            log('─── CHECKPOINT 05: Retailer Selection ───', 'checkpoint');
+            log('Awaiting retailer treasury selection event...', 'system');
+            await delay(600);
+            log('Selection event received: michael.murphy@tjx.com', 'response');
+            log('Invoice ' + oracleResponses.invoice.InvoiceId + ' selected for early pay', 'response');
+            setResult('05', 'PASS');
+            log('CP05 Result: PASS (explicit retailer intent)', 'checkpoint');
+            await delay(300);
+
+            // Revalidation
+            log('═══ REVALIDATION (Fresh ERP State) ═══', 'system');
+            log('Re-querying Oracle ERP for current invoice state...', 'query');
+            await delay(500);
+            log('CP02-04 revalidated: No state changes detected', 'response');
+            await delay(300);
+
+            // CP06
+            log('─── CHECKPOINT 06: Duplicate Detection ───', 'checkpoint');
+            log('Hash input: TJX|SUP-4421|847291|127450.00|2024-01-15', 'calc');
+            log('SHA-256: a3f8b2c1d4e5f6a7b8c9d0e1f2a3b4c5...', 'calc');
+            await delay(250);
+            log('Query funded_invoices WHERE invoice_hash = :hash', 'query');
+            await delay(200);
+            log('Result: 0 rows (no duplicate)', 'response');
+            setResult('06', 'PASS');
+            log('CP06 Result: PASS', 'checkpoint');
+            await delay(300);
+
+            // CP07
+            log('─── CHECKPOINT 07: Historical Relationship ───', 'checkpoint');
+            setActiveData('Graph');
+            log('MATCH (r:Retailer {id:"TJX"})-[p:PAYS]->(s:Supplier {id:"SUP-4421"}) RETURN p', 'query');
+            await delay(400);
+            log('Edge found: ' + oracleResponses.payorGraph.invoice_count + ' invoices over 22 months', 'response');
+            log('Avg payment: ' + oracleResponses.payorGraph.actual_avg_days + ' days (stated: ' + oracleResponses.payorGraph.stated_terms + ')', 'response');
+            log('Dispute rate: 1.42%', 'calc');
+            log('Relationship score: 94.6', 'calc');
+            setResult('07', 'PASS');
+            log('CP07 Result: PASS', 'checkpoint');
+            await delay(300);
+
+            // CP08
+            log('─── CHECKPOINT 08: Third Party Enrichment ───', 'checkpoint');
+            log('Querying D&B API...', 'query');
+            await delay(300);
+            log('PAYDEX Score: 82', 'response');
+            log('Querying OFAC SDN list...', 'query');
+            await delay(200);
+            log('OFAC Match: false', 'response');
+            log('Querying CA Secretary of State...', 'query');
+            await delay(200);
+            log('Corporate Standing: ACTIVE', 'response');
+            setResult('08', 'PASS');
+            log('CP08 Result: PASS', 'checkpoint');
+            await delay(300);
+
+            // CP09-11
+            log('─── CHECKPOINTS 09-11: Supplier Domain ───', 'checkpoint');
+            log('Supplier pre-verified at onboarding (2023-06-15)', 'system');
+            setResult('09', 'PASS');
+            setResult('10', 'PASS');
+            setResult('11', 'PASS');
+            log('CP09 (KYC/AML): PASS', 'checkpoint');
+            log('CP10 (Bank Account): PASS', 'checkpoint');
+            log('CP11 (Entity Verification): PASS', 'checkpoint');
+            await delay(300);
+
+            // CP12
+            log('─── CHECKPOINT 12: Underwriting Verdict ───', 'checkpoint');
+            log('Fusing checkpoint signals...', 'system');
+            await delay(200);
+            log('payment_history: 0.35 × 0.89 = 0.312', 'calc');
+            log('industry_risk: 0.20 × 0.82 = 0.164', 'calc');
+            log('invoice_characteristics: 0.20 × 0.91 = 0.182', 'calc');
+            log('customer_concentration: 0.15 × 0.78 = 0.117', 'calc');
+            log('macro_factors: 0.10 × 0.72 = 0.072', 'calc');
+            log('Underwriting score: 0.847', 'calc');
+            setResult('12', 'PASS');
+            log('CP12 Result: APPROVE', 'checkpoint');
+            await delay(300);
+
+            // CP13
+            log('─── CHECKPOINT 13: Outcome Tracking ───', 'checkpoint');
+            log('Payment monitoring initiated', 'system');
+            log('Expected payment: 2024-02-14', 'system');
+            log('Outcome will update Payor Graph edge', 'system');
+            setResult('13', 'HOLD');
+            log('CP13 Result: HOLD (awaiting payment)', 'checkpoint');
+
+            log('═══ VERIFICATION COMPLETE ═══', 'system');
+            setActiveData(null);
+            document.getElementById('executeBtn').disabled = false;
+        }
+
+        // Check for PO filter from The Tape
+        function checkFilter() {
+            const params = new URLSearchParams(window.location.search);
+            const po = params.get('po');
+            const inv = params.get('inv');
+            const obligor = params.get('obligor');
+
+            if (po || inv) {
+                const filterIndicator = document.getElementById('filterIndicator');
+                filterIndicator.classList.add('visible');
+                filterIndicator.textContent = `Filter: ${inv || po} ${obligor ? '(' + obligor + ')' : ''}`;
+
+                // Update Oracle data with filtered values
+                if (po) oracleResponses.purchaseOrder.POHeaderId = po;
+                if (inv) oracleResponses.invoice.InvoiceId = inv;
+
+                // Refresh data panels
+                initDataPanels();
+
+                // Auto-run verification
+                setTimeout(runVerification, 500);
+            }
+        }
+
+        // Initialize
+        initDataPanels();
+        initCheckpointTable();
+        checkFilter();
+    </script>
+</body>
+</html>

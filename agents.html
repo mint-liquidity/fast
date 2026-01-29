@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MINT | Agents</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --mint-navy: #0B0D11;
+            --mint-navy-light: #12151A;
+            --mint-navy-lighter: #1A1E25;
+            --mint-gray: #3B4046;
+            --mint-gray-light: #6B7280;
+            --mint-gray-lighter: #9CA3AF;
+            --mint-white: #D1D5DB;
+            --mint-text: #B0B7C0;
+            --mint-text-bright: #E5E7EB;
+            --mint-green: #5A9A7C;
+            --mint-green-dim: rgba(90, 154, 124, 0.15);
+            --surface-base: #0B0D11;
+            --surface-card: #12151A;
+            --surface-elevated: #1A1E25;
+            --border-subtle: rgba(255, 255, 255, 0.06);
+            --border-medium: rgba(255, 255, 255, 0.10);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--surface-base);
+            color: var(--mint-white);
+            line-height: 1.5;
+            min-height: 100vh;
+        }
+
+        .mono { font-family: 'JetBrains Mono', 'SF Mono', monospace; }
+
+        /* Navigation Bar */
+        .mint-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 24px;
+            background: var(--surface-card);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+        .mint-nav-left { display: flex; align-items: center; gap: 32px; }
+        .mint-nav-logo { font-size: 15px; font-weight: 600; color: var(--mint-text-bright); letter-spacing: 0.3px; }
+        .mint-nav-tabs { display: flex; gap: 8px; }
+        .nav-tab {
+            padding: 10px 24px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            color: var(--mint-gray-light);
+            background: transparent;
+            border: 1px solid var(--border-subtle);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.15s;
+            text-decoration: none;
+        }
+        .nav-tab:hover { border-color: var(--mint-gray); color: var(--mint-text-bright); }
+        .nav-tab.active { color: var(--mint-text-bright); background: var(--surface-elevated); border-color: var(--mint-text); }
+
+        .nav-right { display: flex; align-items: center; gap: 16px; font-size: 11px; color: var(--mint-gray-light); }
+
+        /* Demo Narration */
+        .demo-narration {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 14px 24px;
+            background: var(--surface-card);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+        .demo-narration-icon { color: var(--mint-green); font-size: 14px; }
+        .demo-narration-text { flex: 1; }
+        .demo-label { font-size: 9px; font-weight: 700; color: var(--mint-green); text-transform: uppercase; letter-spacing: 1px; padding: 2px 6px; background: var(--mint-green-dim); border-radius: 2px; margin-right: 10px; }
+        .demo-narration-source { font-size: 10px; color: var(--mint-gray-light); font-family: 'JetBrains Mono', monospace; }
+
+        /* Agents Container */
+        .agents-container {
+            padding: 20px 24px;
+            height: calc(100vh - 120px);
+            overflow-y: auto;
+        }
+
+        /* Hero Metrics */
+        .agents-hero-metrics {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .agents-metric-card {
+            background: var(--surface-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 4px;
+            padding: 16px 20px;
+            text-align: center;
+        }
+        .agents-metric-card.pulse {
+            animation: pulse 2s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { border-color: var(--border-subtle); }
+            50% { border-color: var(--mint-green); }
+        }
+
+        .agents-metric-label {
+            font-size: 9px;
+            font-weight: 600;
+            color: var(--mint-gray-light);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 6px;
+        }
+        .agents-metric-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--mint-text-bright);
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .agents-metric-value.accent { color: var(--mint-green); }
+
+        /* Main Section */
+        .agents-main-section {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 20px;
+            height: calc(100% - 140px);
+        }
+
+        /* Agent Cards Grid */
+        .agent-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            align-content: start;
+        }
+
+        .agent-card-main {
+            background: var(--surface-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 6px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            gap: 14px;
+        }
+        .agent-card-main:hover {
+            border-color: var(--mint-gray);
+            background: var(--surface-elevated);
+        }
+        .agent-card-main.selected {
+            border-color: var(--mint-green);
+            background: rgba(90, 154, 124, 0.08);
+        }
+
+        .agent-icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--surface-elevated);
+            border-radius: 8px;
+            font-size: 18px;
+            color: var(--mint-text-bright);
+            flex-shrink: 0;
+        }
+
+        .agent-info { flex: 1; min-width: 0; }
+
+        .agent-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+
+        .agent-name {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--mint-text-bright);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .agent-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 9px;
+            font-weight: 600;
+            color: var(--mint-green);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .agent-status .status-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--mint-green);
+            border-radius: 50%;
+            animation: blink 1.5s ease-in-out infinite;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .agent-desc {
+            font-size: 11px;
+            color: var(--mint-gray-light);
+            line-height: 1.4;
+            margin-bottom: 10px;
+        }
+
+        .agent-card-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+        .agent-card-metric { text-align: center; }
+        .agent-card-metric-label {
+            font-size: 8px;
+            color: var(--mint-gray-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .agent-card-metric-value {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--mint-text-bright);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Activity Panel */
+        .agents-activity-panel {
+            background: var(--surface-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .agents-activity-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: var(--surface-elevated);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .agents-activity-title {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--mint-gray-light);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        .agents-activity-badge {
+            font-size: 8px;
+            font-weight: 700;
+            color: var(--mint-green);
+            padding: 3px 8px;
+            background: var(--mint-green-dim);
+            border-radius: 3px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .agents-activity-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px;
+        }
+
+        .agents-activity-item {
+            display: grid;
+            grid-template-columns: 60px 90px 1fr auto;
+            gap: 10px;
+            padding: 10px 12px;
+            background: var(--surface-base);
+            border-radius: 4px;
+            margin-bottom: 6px;
+            font-size: 10px;
+            align-items: center;
+        }
+
+        .agents-activity-time {
+            color: var(--mint-gray-light);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 9px;
+        }
+
+        .agents-activity-agent {
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 9px;
+        }
+        .agents-activity-agent.orchestrator { color: #8B5CF6; }
+        .agents-activity-agent.discovery { color: #3B82F6; }
+        .agents-activity-agent.extraction { color: #10B981; }
+        .agents-activity-agent.underwriting { color: #F59E0B; }
+        .agents-activity-agent.learning { color: #EC4899; }
+
+        .agents-activity-message {
+            color: var(--mint-text);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .agents-activity-tag {
+            font-size: 8px;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 2px;
+            text-transform: uppercase;
+        }
+        .agents-activity-tag.success { background: var(--mint-green-dim); color: var(--mint-green); }
+        .agents-activity-tag.info { background: rgba(59, 130, 246, 0.15); color: #60A5FA; }
+        .agents-activity-tag.warning { background: rgba(245, 158, 11, 0.15); color: #FBBF24; }
+
+        /* Agent Detail Panel */
+        .agent-detail-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            z-index: 100;
+        }
+        .agent-detail-overlay.visible { opacity: 1; visibility: visible; }
+
+        .agent-detail-panel {
+            position: fixed;
+            top: 0;
+            right: -500px;
+            width: 500px;
+            height: 100vh;
+            background: var(--surface-card);
+            border-left: 1px solid var(--border-medium);
+            transition: right 0.3s ease;
+            z-index: 101;
+            display: flex;
+            flex-direction: column;
+        }
+        .agent-detail-panel.open { right: 0; }
+
+        .agent-detail-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            background: var(--surface-elevated);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+        .agent-detail-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--mint-text-bright);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .agent-detail-close {
+            padding: 8px 14px;
+            font-size: 10px;
+            font-weight: 600;
+            background: var(--surface-base);
+            border: 1px solid var(--border-medium);
+            color: var(--mint-gray-lighter);
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .agent-detail-close:hover { border-color: var(--mint-text); color: var(--mint-text-bright); }
+
+        .agent-detail-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .agent-detail-section { margin-bottom: 24px; }
+        .agent-detail-section-title {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--mint-gray-light);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .agent-detail-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+        .agent-detail-metric {
+            background: var(--surface-base);
+            padding: 12px;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .agent-detail-metric-label {
+            font-size: 9px;
+            color: var(--mint-gray-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+        .agent-detail-metric-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--mint-text-bright);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .agent-code-block {
+            background: var(--surface-base);
+            border: 1px solid var(--border-subtle);
+            border-radius: 4px;
+            padding: 14px;
+            font-size: 10px;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--mint-gray-lighter);
+            white-space: pre-wrap;
+            line-height: 1.6;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="mint-nav">
+        <div class="mint-nav-left">
+            <div class="mint-nav-logo">MINT</div>
+            <div class="mint-nav-tabs">
+                <a href="tape.html" class="nav-tab">The Tape</a>
+                <a href="checkpoint.html" class="nav-tab">Checkpoint</a>
+                <a href="agents.html" class="nav-tab active">Agents</a>
+            </div>
+        </div>
+        <div class="nav-right">
+            <span id="clock"></span>
+        </div>
+    </nav>
+
+    <!-- Demo Narration -->
+    <div class="demo-narration">
+        <div class="demo-narration-icon">◉</div>
+        <div class="demo-narration-text">
+            <span class="demo-label">AGENT ORCHESTRATION</span>
+            5 autonomous agents running on CrewAI/LangGraph. Processing TJX, OLLI, ROST receivables in real-time.
+        </div>
+        <div class="demo-narration-source">Runtime: AWS EKS | Model: Claude 3.5 Sonnet</div>
+    </div>
+
+    <!-- Agents Container -->
+    <div class="agents-container">
+        <!-- Hero Metrics -->
+        <div class="agents-hero-metrics">
+            <div class="agents-metric-card">
+                <div class="agents-metric-label">Processed / 24H</div>
+                <div class="agents-metric-value" id="agents-invoices-processed">847,293</div>
+            </div>
+            <div class="agents-metric-card">
+                <div class="agents-metric-label">Qualified</div>
+                <div class="agents-metric-value">95.7%</div>
+            </div>
+            <div class="agents-metric-card">
+                <div class="agents-metric-label">Latency</div>
+                <div class="agents-metric-value">36ms</div>
+            </div>
+            <div class="agents-metric-card">
+                <div class="agents-metric-label">Agents</div>
+                <div class="agents-metric-value accent">5/5</div>
+            </div>
+            <div class="agents-metric-card">
+                <div class="agents-metric-label">Pipeline</div>
+                <div class="agents-metric-value">$2.1B</div>
+            </div>
+        </div>
+
+        <!-- Agents Grid + Activity -->
+        <div class="agents-main-section">
+            <div class="agent-cards-grid">
+                <div class="agent-card-main" data-agent="orchestrator" onclick="selectAgentCard('orchestrator')">
+                    <div class="agent-icon">◈</div>
+                    <div class="agent-info">
+                        <div class="agent-card-header">
+                            <div class="agent-name">Orchestration Agent</div>
+                            <div class="agent-status"><div class="status-dot"></div>ACTIVE</div>
+                        </div>
+                        <div class="agent-desc">Meta-agent coordinating all subsidiary agents via CrewAI/LangGraph</div>
+                        <div class="agent-card-metrics">
+                            <div class="agent-card-metric"><div class="agent-card-metric-label">Tasks Routed</div><div class="agent-card-metric-value">1.2M</div></div>
+                            <div class="agent-card-metric"><div class="agent-card-metric-label">Avg Latency</div><div class="agent-card-metric-value">12ms</div></div>
+                            <div class="agent-card-metric"><div class="agent-card-metric-label">Uptime</div><div class="agent-card-metric-value">99.99%</div></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="agent-card-main" data-agent="discovery" onclick="selectAgentCard('discovery')">
+                    <div class="agent-icon">◎</div>
+                    <div class="agent-info">
+                        <div class="agent-card-header">
+                            <div class="agent-name">Discovery Agent</div>
+                            <div class="agent-status"><div class="status-dot"></div>SCANNING</div>
+                        </div>
+                        <div class="agent-desc">Lightweight scanner identifying high-value invoices without pulling full datasets</div>
+                        <div class="agent-card-metrics">
+                            <div class="agent-card-metric"><div class="agent-card-metric-label">Scanned</div><div class="agent-card-metric-value">84.7M</div></div>
+                            <div class="agent-card-metric"><div class="agent-card-metric-label">Selected</div><div class="agent-card-metric-value">847K</div></div>
+                            <div class="agent-card-metric"><div class="agent-card-metric-label">Extraction Rate</div><div class="agent-card-metric-value">1.0%</div></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="agent-card-main" data-agent="extraction" onclick="selectAgentCard('extraction')">
+                    <div class="agent-icon">⬡</div>
+                    <div class="agent-info">
+                        <div class="agent-card-header">
+                            <div class="agent-name">Extraction Agent</div>
+                            <div class="agent-status"><div class="status-dot"></div>PULLING</div>
+                        </div>
+                        <div class="agent-desc">ERP-specific agents pulling only selected invoices with 100x efficiency</div>
+                        <div class="agent-card-metrics">
+                            <div class="agent-card-metric"><div class="agent-card-metric-label">API Calls</div><div class="agent-card-metric-value">892K</div></div>
+                            <div class="agent-card-metric"><div class="agent-card-metric-label">Cost Savings</div><div class="agent-card-metric-value">$89K</div></div>
+                            <div class="agent-card-metric"><div class="agent-card-metric-label">Efficiency</div><div class="agent-card-metric-value">100x</div></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="agent-card-main" data-agent="underwriting" onclick="selectAgentCard('underwriting')">
+                    <div class="agent-icon">◆</div>
+                    <div class="agent-info">
+                        <div class="agent-card-header">
+                            <div class="agent-name">Underwriting Agent</div>
+                            <div class="agent-status"><div class="status-dot"></div>SCORING</div>
+                        </div>
+                        <div class="agent-desc">Real-time risk assessment using accumulated network data and ML models</div>
+                        <div class="agent-card-metrics">
+                            <div class="agent-card-metric"><div class="agent-card-metric-label">Decisions</div><div class="agent-card-metric-value">847K</div></div>
+                            <div class="agent-card-metric"><div class="agent-card-metric-label">Approval Rate</div><div class="agent-card-metric-value">95.7%</div></div>
+                            <div class="agent-card-metric"><div class="agent-card-metric-label">Avg Score</div><div class="agent-card-metric-value">0.912</div></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="agent-card-main" data-agent="learning" onclick="selectAgentCard('learning')">
+                    <div class="agent-icon">◇</div>
+                    <div class="agent-info">
+                        <div class="agent-card-header">
+                            <div class="agent-name">Learning Agent</div>
+                            <div class="agent-status"><div class="status-dot"></div>TRAINING</div>
+                        </div>
+                        <div class="agent-desc">Continuous optimization based on payment outcomes and feedback loops</div>
+                        <div class="agent-card-metrics">
+                            <div class="agent-card-metric"><div class="agent-card-metric-label">Outcomes</div><div class="agent-card-metric-value">2.1M</div></div>
+                            <div class="agent-card-metric"><div class="agent-card-metric-label">Model Ver</div><div class="agent-card-metric-value">v3.2.1</div></div>
+                            <div class="agent-card-metric"><div class="agent-card-metric-label">Accuracy</div><div class="agent-card-metric-value">98.4%</div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="agents-activity-panel">
+                <div class="agents-activity-header">
+                    <div class="agents-activity-title">Agent Activity</div>
+                    <div class="agents-activity-badge">LIVE</div>
+                </div>
+                <div class="agents-activity-list" id="agents-activity-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Agent Detail Panel -->
+    <div class="agent-detail-overlay" id="agent-detail-overlay" onclick="closeAgentPanel()"></div>
+    <div class="agent-detail-panel" id="agent-detail-panel">
+        <div class="agent-detail-header">
+            <div class="agent-detail-title" id="agent-detail-title">Agent Details</div>
+            <button class="agent-detail-close" onclick="closeAgentPanel()">ESC CLOSE</button>
+        </div>
+        <div class="agent-detail-content" id="agent-detail-content"></div>
+    </div>
+
+    <script>
+        // Clock
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('clock').textContent = now.toLocaleString('en-US', {
+                month: '2-digit', day: '2-digit', year: 'numeric',
+                hour: '2-digit', minute: '2-digit', second: '2-digit',
+                hour12: true, timeZoneName: 'short'
+            });
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // Agent Details
+        const agentDetails = {
+            orchestrator: {
+                name: 'Orchestration Agent',
+                role: 'Meta-Controller & Task Router',
+                description: 'Routes tasks to specialized agents. Manages queue priority, resource allocation, and error recovery.',
+                metrics: [
+                    { label: 'Tasks Routed', value: '1.2M' },
+                    { label: 'Avg Latency', value: '12ms' },
+                    { label: 'Uptime', value: '99.99%' },
+                    { label: 'Queue Depth', value: '47' },
+                    { label: 'Error Rate', value: '0.001%' },
+                    { label: 'Throughput', value: '8.4K/s' }
+                ],
+                code: `@agent(role="orchestrator")
+class OrchestrationAgent:
+    def route_task(self, task: Task) -> Agent:
+        priority = self.calculate_priority(task)
+        agent = self.select_agent(task.type)
+        self.queue.push(task, priority)
+        return agent.execute(task)
+
+    def handle_failure(self, task: Task, error: Error):
+        if task.retries < MAX_RETRIES:
+            self.retry(task)
+        else:
+            self.escalate(task, error)`
+            },
+            discovery: {
+                name: 'Discovery Agent',
+                role: 'Lightweight Invoice Scanner',
+                description: 'Scans retailer ERP metadata to identify fundable invoices. Uses probabilistic filtering to minimize API calls.',
+                metrics: [
+                    { label: 'Scanned', value: '84.7M' },
+                    { label: 'Selected', value: '847K' },
+                    { label: 'Extraction Rate', value: '1.0%' },
+                    { label: 'Scan Speed', value: '12K/s' },
+                    { label: 'False Positive', value: '2.3%' },
+                    { label: 'Coverage', value: '100%' }
+                ],
+                code: `@agent(role="discovery")
+class DiscoveryAgent:
+    def scan_erp(self, retailer: Retailer) -> List[Invoice]:
+        # Lightweight metadata scan
+        candidates = self.query_invoice_headers(
+            retailer,
+            filters=["status='APPROVED'", "age<60"]
+        )
+
+        return [inv for inv in candidates
+                if self.quick_score(inv) > 0.85]`
+            },
+            extraction: {
+                name: 'Extraction Agent',
+                role: 'ERP Data Extraction Specialist',
+                description: 'Pulls full invoice data only for selected candidates. Supports Oracle, SAP, NetSuite via OData/REST.',
+                metrics: [
+                    { label: 'API Calls', value: '892K' },
+                    { label: 'Cost Savings', value: '$89K' },
+                    { label: 'Efficiency', value: '100x' },
+                    { label: 'Avg Response', value: '240ms' },
+                    { label: 'Success Rate', value: '99.7%' },
+                    { label: 'Data Volume', value: '2.4TB' }
+                ],
+                code: `@agent(role="extraction")
+class ExtractionAgent:
+    adapters = {
+        'oracle': OracleERPAdapter(),
+        'sap': SAPHanaAdapter(),
+        'netsuite': NetSuiteAdapter()
+    }
+
+    def extract(self, invoice_id: str, erp: str):
+        adapter = self.adapters[erp]
+        return adapter.get_full_invoice(
+            invoice_id,
+            include=['line_items', 'po', 'gr']
+        )`
+            },
+            underwriting: {
+                name: 'Underwriting Agent',
+                role: 'Real-Time Risk Assessment',
+                description: 'Scores invoices using Payor Graph relationships, historical data, and external enrichment.',
+                metrics: [
+                    { label: 'Decisions', value: '847K' },
+                    { label: 'Approval Rate', value: '95.7%' },
+                    { label: 'Avg Score', value: '0.912' },
+                    { label: 'Avg Latency', value: '18ms' },
+                    { label: 'Model AUC', value: '0.94' },
+                    { label: 'Loss Rate', value: '0.12%' }
+                ],
+                code: `@agent(role="underwriting")
+class UnderwritingAgent:
+    def score(self, invoice: Invoice) -> Decision:
+        features = self.extract_features(invoice)
+
+        # Multi-factor scoring
+        score = (
+            0.35 * self.payment_history(invoice) +
+            0.25 * self.payor_graph_score(invoice) +
+            0.20 * self.invoice_characteristics(invoice) +
+            0.20 * self.external_enrichment(invoice)
+        )
+
+        return Decision(score, self.recommend(score))`
+            },
+            learning: {
+                name: 'Learning Agent',
+                role: 'Continuous Model Optimization',
+                description: 'Ingests payment outcomes to retrain models. Maintains feedback loops for all decision agents.',
+                metrics: [
+                    { label: 'Outcomes', value: '2.1M' },
+                    { label: 'Model Version', value: 'v3.2.1' },
+                    { label: 'Accuracy', value: '98.4%' },
+                    { label: 'Training Freq', value: '6h' },
+                    { label: 'Feature Count', value: '847' },
+                    { label: 'Drift Score', value: '0.02' }
+                ],
+                code: `@agent(role="learning")
+class LearningAgent:
+    def process_outcome(self, outcome: PaymentOutcome):
+        # Update Payor Graph
+        self.graph.update_edge(
+            outcome.retailer,
+            outcome.supplier,
+            outcome.to_features()
+        )
+
+        # Trigger retraining if drift detected
+        if self.detect_drift() > DRIFT_THRESHOLD:
+            self.schedule_retrain()`
+            }
+        };
+
+        // Activity Feed
+        const agentActivities = [
+            { time: '14:32:01', agent: 'orchestrator', message: 'Routed 847 tasks to extraction queue', tag: 'success' },
+            { time: '14:32:00', agent: 'discovery', message: 'Scan complete: TJX batch 2024-01-28', tag: 'success' },
+            { time: '14:31:58', agent: 'extraction', message: 'Pulled INV-77815 from Oracle ERP', tag: 'success' },
+            { time: '14:31:55', agent: 'underwriting', message: 'Scored INV-77814: 0.94 → APPROVE', tag: 'success' },
+            { time: '14:31:52', agent: 'learning', message: 'Payment received: INV-77412 (on-time)', tag: 'info' },
+            { time: '14:31:48', agent: 'orchestrator', message: 'Priority escalation: ROST high-value batch', tag: 'warning' },
+            { time: '14:31:45', agent: 'discovery', message: 'Starting scan: OLLI ERP metadata', tag: 'info' },
+            { time: '14:31:42', agent: 'extraction', message: 'Batch complete: 23 invoices from SAP', tag: 'success' },
+            { time: '14:31:38', agent: 'underwriting', message: 'Rejected INV-77813: score 0.62', tag: 'warning' },
+            { time: '14:31:35', agent: 'learning', message: 'Model drift: 0.018 (within threshold)', tag: 'info' }
+        ];
+
+        // Render Activity Feed
+        function renderActivityFeed() {
+            document.getElementById('agents-activity-list').innerHTML = agentActivities.map(a =>
+                `<div class="agents-activity-item">
+                    <span class="agents-activity-time">${a.time}</span>
+                    <span class="agents-activity-agent ${a.agent}">${a.agent.toUpperCase()}</span>
+                    <span class="agents-activity-message">${a.message}</span>
+                    <span class="agents-activity-tag ${a.tag}">${a.tag}</span>
+                </div>`
+            ).join('');
+        }
+
+        // Select Agent Card
+        function selectAgentCard(agentId) {
+            const agent = agentDetails[agentId];
+            if (!agent) return;
+
+            document.querySelectorAll('.agent-card-main').forEach(card => card.classList.remove('selected'));
+            document.querySelector(`[data-agent="${agentId}"]`).classList.add('selected');
+
+            document.getElementById('agent-detail-title').textContent = agent.name;
+            document.getElementById('agent-detail-content').innerHTML = `
+                <div class="agent-detail-section">
+                    <div class="agent-detail-section-title">Role</div>
+                    <p style="color: var(--mint-green); font-size: 13px; margin-bottom: 8px;">${agent.role}</p>
+                    <p style="color: var(--mint-gray-light); font-size: 11px; line-height: 1.6;">${agent.description}</p>
+                </div>
+                <div class="agent-detail-section">
+                    <div class="agent-detail-section-title">Performance Metrics</div>
+                    <div class="agent-detail-metrics">
+                        ${agent.metrics.map(m => `
+                            <div class="agent-detail-metric">
+                                <div class="agent-detail-metric-label">${m.label}</div>
+                                <div class="agent-detail-metric-value">${m.value}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                <div class="agent-detail-section">
+                    <div class="agent-detail-section-title">Implementation</div>
+                    <div class="agent-code-block">${agent.code}</div>
+                </div>
+            `;
+
+            document.getElementById('agent-detail-overlay').classList.add('visible');
+            document.getElementById('agent-detail-panel').classList.add('open');
+        }
+
+        // Close Agent Panel
+        function closeAgentPanel() {
+            document.getElementById('agent-detail-overlay').classList.remove('visible');
+            document.getElementById('agent-detail-panel').classList.remove('open');
+            document.querySelectorAll('.agent-card-main').forEach(card => card.classList.remove('selected'));
+        }
+
+        // Keyboard handler
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeAgentPanel();
+        });
+
+        // Counter Animation
+        let agentsUpdateInterval = null;
+        function startAgentsCounter() {
+            if (agentsUpdateInterval) clearInterval(agentsUpdateInterval);
+            agentsUpdateInterval = setInterval(() => {
+                const counter = document.getElementById('agents-invoices-processed');
+                if (counter) {
+                    let val = parseInt(counter.textContent.replace(/,/g, ''));
+                    val += Math.floor(Math.random() * 50) + 10;
+                    counter.textContent = val.toLocaleString();
+                }
+            }, 2000);
+        }
+
+        // Initialize
+        renderActivityFeed();
+        startAgentsCounter();
+    </script>
+</body>
+</html>
