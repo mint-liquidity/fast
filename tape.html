@@ -4,22 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MINT | The Tape</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
         :root {
             --mint-navy: #0B0D11;
             --mint-navy-light: #12151A;
-            --mint-navy-lighter: #1A1E25;
             --mint-gray: #3B4046;
             --mint-gray-light: #6B7280;
-            --mint-gray-lighter: #9CA3AF;
-            --mint-white: #D1D5DB;
-            --mint-text: #B0B7C0;
-            --mint-text-bright: #E5E7EB;
-            --mint-green: #5A9A7C;
-            --mint-green-dim: rgba(90, 154, 124, 0.15);
-            --mint-red: #C45A5A;
-            --mint-red-dim: rgba(196, 90, 90, 0.15);
+            --mint-white: #E5E7EB;
+            --mint-green: #059669;
+            --mint-red: #DC2626;
+            --mint-amber: #D97706;
             --mint-blue: #007AFF;
             --surface-base: #0B0D11;
             --surface-card: #12151A;
@@ -27,20 +22,16 @@
             --border-subtle: rgba(255, 255, 255, 0.06);
             --border-medium: rgba(255, 255, 255, 0.10);
         }
-
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: 'Inter', system-ui, sans-serif;
             background: var(--surface-base);
             color: var(--mint-white);
-            line-height: 1.5;
             min-height: 100vh;
         }
+        .mono { font-family: 'JetBrains Mono', monospace; }
 
-        .mono { font-family: 'JetBrains Mono', 'SF Mono', monospace; }
-
-        /* Navigation Bar */
+        /* Navigation */
         .mint-nav {
             display: flex;
             align-items: center;
@@ -50,7 +41,7 @@
             border-bottom: 1px solid var(--border-subtle);
         }
         .mint-nav-left { display: flex; align-items: center; gap: 32px; }
-        .mint-nav-logo { font-size: 15px; font-weight: 600; color: var(--mint-text-bright); letter-spacing: 0.3px; }
+        .mint-nav-logo { font-size: 15px; font-weight: 600; color: var(--mint-white); letter-spacing: 0.3px; }
         .mint-nav-tabs { display: flex; gap: 8px; }
         .nav-tab {
             padding: 10px 24px;
@@ -66,247 +57,381 @@
             transition: all 0.15s;
             text-decoration: none;
         }
-        .nav-tab:hover { border-color: var(--mint-gray); color: var(--mint-text-bright); }
-        .nav-tab.active { color: var(--mint-text-bright); background: var(--surface-elevated); border-color: var(--mint-text); }
+        .nav-tab:hover { border-color: var(--mint-gray); color: var(--mint-white); }
+        .nav-tab.active { color: var(--mint-white); background: var(--surface-elevated); border-color: var(--mint-white); }
 
-        .nav-right { display: flex; align-items: center; gap: 16px; font-size: 11px; color: var(--mint-gray-light); }
-
-        /* Demo Narration */
-        .demo-narration {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            padding: 14px 24px;
-            background: var(--surface-card);
-            border-bottom: 1px solid var(--border-subtle);
-        }
-        .demo-narration-icon { color: var(--mint-green); font-size: 14px; }
-        .demo-narration-content { flex: 1; }
-        .demo-narration-row { display: flex; align-items: center; gap: 12px; }
-        .demo-label { font-size: 9px; font-weight: 700; color: var(--mint-green); text-transform: uppercase; letter-spacing: 1px; padding: 2px 6px; background: var(--mint-green-dim); border-radius: 2px; }
-        .demo-text { font-size: 11px; color: var(--mint-gray-lighter); }
-        .demo-narration-row.secondary { margin-top: 4px; }
-        .demo-source { font-size: 10px; color: var(--mint-gray-light); font-family: 'JetBrains Mono', monospace; }
-        .demo-narration-stats { display: flex; gap: 20px; }
-        .demo-stat { text-align: center; }
-        .demo-stat-value { font-size: 14px; font-weight: 700; color: var(--mint-text-bright); font-family: 'JetBrains Mono', monospace; }
-        .demo-stat-label { font-size: 8px; color: var(--mint-gray-light); text-transform: uppercase; letter-spacing: 0.5px; }
-
-        /* Main Container */
-        .main-container { height: calc(100vh - 120px); padding: 20px 24px; }
-
-        /* Production Grid */
-        .production-container { height: 100%; display: flex; flex-direction: column; gap: 16px; }
-
-        .obligor-tabs { display: flex; gap: 8px; flex-shrink: 0; }
-        .obligor-tab {
-            display: flex; align-items: center; gap: 8px;
-            padding: 10px 20px;
-            background: var(--surface-card);
-            border: 1px solid var(--border-subtle);
-            border-radius: 4px;
-            cursor: pointer;
-            transition: all 0.15s;
-        }
-        .obligor-tab:hover { border-color: var(--mint-gray); }
-        .obligor-tab.active { background: var(--surface-elevated); border-color: var(--mint-text); }
-        .obligor-ticker { font-size: 12px; font-weight: 700; color: var(--mint-text-bright); }
-        .obligor-rating { font-size: 10px; color: var(--mint-gray-light); font-family: 'JetBrains Mono', monospace; }
-
-        .production-grid {
-            flex: 1;
+        /* Main Layout */
+        .main-layout {
             display: grid;
-            grid-template-columns: 380px 1fr;
-            gap: 16px;
-            overflow: hidden;
+            grid-template-columns: 280px 1fr;
+            height: calc(100vh - 57px);
         }
 
-        /* Invoice List Panel */
-        .invoice-list-panel {
+        /* Filter Panel */
+        .filter-panel {
             background: var(--surface-card);
-            border: 1px solid var(--border-subtle);
-            border-radius: 4px;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-        .panel-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px 16px;
-            background: var(--surface-elevated);
-            border-bottom: 1px solid var(--border-subtle);
-        }
-        .panel-title { font-size: 10px; font-weight: 600; color: var(--mint-gray-light); text-transform: uppercase; letter-spacing: 0.8px; }
-        .invoice-count { font-size: 11px; font-weight: 700; color: var(--mint-text-bright); font-family: 'JetBrains Mono', monospace; padding: 2px 8px; background: var(--surface-base); border-radius: 3px; }
-
-        .invoice-list { flex: 1; overflow-y: auto; padding: 8px; }
-
-        .invoice-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px 14px;
-            background: var(--surface-base);
-            border: 1px solid var(--border-subtle);
-            border-radius: 4px;
-            margin-bottom: 6px;
-            cursor: pointer;
-            transition: all 0.15s;
-        }
-        .invoice-item:hover { border-color: var(--mint-gray); background: var(--surface-elevated); }
-        .invoice-item.selected { border-color: var(--mint-green); background: rgba(90, 154, 124, 0.08); }
-        .invoice-item.mismatch { border-left: 3px solid var(--mint-red); }
-        .invoice-item.pending { opacity: 0.7; }
-
-        .invoice-item-left { display: flex; flex-direction: column; gap: 2px; }
-        .invoice-id { font-size: 12px; font-weight: 600; color: var(--mint-text-bright); }
-        .invoice-supplier { font-size: 10px; color: var(--mint-gray-light); }
-
-        .invoice-item-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
-        .invoice-amount { font-size: 13px; font-weight: 600; color: var(--mint-text-bright); font-family: 'JetBrains Mono', monospace; }
-        .invoice-status-badge {
-            font-size: 8px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            padding: 2px 6px;
-            border-radius: 2px;
-        }
-        .invoice-status-badge.ready { background: var(--mint-green-dim); color: var(--mint-green); }
-        .invoice-status-badge.mismatch { background: var(--mint-red-dim); color: var(--mint-red); }
-        .invoice-status-badge.pending { background: rgba(107, 114, 128, 0.2); color: var(--mint-gray-lighter); }
-
-        /* Comparison Panel */
-        .comparison-panel {
-            background: var(--surface-card);
-            border: 1px solid var(--border-subtle);
-            border-radius: 4px;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        .comparison-header {
-            display: grid;
-            grid-template-columns: 1fr auto 1fr;
-            gap: 20px;
-            padding: 16px 20px;
-            background: var(--surface-elevated);
-            border-bottom: 1px solid var(--border-subtle);
-        }
-        .source-column { display: flex; flex-direction: column; align-items: center; gap: 4px; }
-        .source-column.center { justify-content: center; }
-        .source-icon { font-size: 16px; }
-        .source-icon.oracle { color: #F59E0B; }
-        .source-icon.supplier { color: var(--mint-green); }
-        .source-label { font-size: 9px; font-weight: 700; color: var(--mint-gray-lighter); text-transform: uppercase; letter-spacing: 0.8px; }
-        .source-system { font-size: 10px; color: var(--mint-text-bright); font-weight: 500; }
-        .source-method { font-size: 9px; color: var(--mint-gray-light); font-family: 'JetBrains Mono', monospace; }
-
-        .verification-badge {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-            padding: 10px 16px;
-            background: var(--surface-base);
-            border: 1px solid var(--border-medium);
-            border-radius: 4px;
-        }
-        .verification-badge.matched { border-color: var(--mint-green); background: var(--mint-green-dim); }
-        .verification-badge.mismatch { border-color: var(--mint-red); background: var(--mint-red-dim); }
-        .verification-icon { font-size: 14px; color: var(--mint-gray-light); }
-        .verification-text { font-size: 9px; font-weight: 700; color: var(--mint-gray-lighter); text-transform: uppercase; letter-spacing: 0.5px; }
-        .verification-badge.matched .verification-text { color: var(--mint-green); }
-        .verification-badge.mismatch .verification-text { color: var(--mint-red); }
-
-        .comparison-grid {
-            flex: 1;
+            border-right: 1px solid var(--border-subtle);
             overflow-y: auto;
             padding: 16px;
         }
-        .comparison-empty {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 200px;
-            color: var(--mint-gray-light);
-            font-size: 12px;
-        }
-
-        .comparison-category {
-            padding: 8px 0 4px;
-            margin-top: 12px;
-        }
-        .comparison-category:first-child { margin-top: 0; }
-        .category-label { font-size: 9px; font-weight: 700; color: var(--mint-gray-light); text-transform: uppercase; letter-spacing: 1px; }
-
-        .comparison-row {
-            display: grid;
-            grid-template-columns: 1fr 50px 1fr;
-            gap: 10px;
-            padding: 8px 0;
-            border-bottom: 1px solid var(--border-subtle);
-        }
-        .comparison-cell { padding: 4px 8px; }
-        .comparison-cell.oracle { background: rgba(245, 158, 11, 0.05); border-radius: 3px; }
-        .comparison-cell.supplier { background: rgba(90, 154, 124, 0.05); border-radius: 3px; }
-        .comparison-field { font-size: 9px; color: var(--mint-gray-light); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; }
-        .comparison-value { font-size: 11px; color: var(--mint-text-bright); font-family: 'JetBrains Mono', monospace; }
-        .match-cell { display: flex; align-items: center; justify-content: center; }
-        .match-indicator { font-size: 14px; font-weight: 700; }
-        .match-indicator.pass { color: var(--mint-green); }
-        .match-indicator.fail { color: var(--mint-red); }
-
-        /* Verification Summary */
-        .verification-summary {
-            display: none;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            padding: 16px;
-            background: var(--surface-elevated);
-            border-top: 1px solid var(--border-subtle);
-        }
-        .verification-source { padding: 10px; background: var(--surface-base); border-radius: 4px; }
-        .source-check { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
-        .check-icon { width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 11px; font-weight: 700; background: var(--surface-elevated); color: var(--mint-gray-light); }
-        .check-icon.confirmed { background: var(--mint-green); color: white; }
-        .check-label { font-size: 10px; font-weight: 600; color: var(--mint-text-bright); }
-        .source-detail { font-size: 9px; color: var(--mint-gray-light); margin-left: 28px; }
-
-        /* Verification Footer */
-        .verification-footer {
+        .filter-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 12px 16px;
-            background: var(--surface-card);
-            border-top: 1px solid var(--border-subtle);
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-subtle);
         }
-        .invoice-meta { display: none; gap: 20px; }
-        .meta-item { display: flex; flex-direction: column; }
-        .meta-label { font-size: 8px; color: var(--mint-gray-light); text-transform: uppercase; letter-spacing: 0.5px; }
-        .meta-value { font-size: 12px; font-weight: 600; color: var(--mint-text-bright); font-family: 'JetBrains Mono', monospace; }
-        .meta-value.accent { color: var(--mint-green); }
-
-        .verify-btn {
-            padding: 12px 24px;
+        .filter-title {
             font-size: 11px;
-            font-weight: 700;
+            font-weight: 600;
+            color: var(--mint-white);
             text-transform: uppercase;
-            letter-spacing: 1px;
-            background: var(--mint-green);
-            color: var(--mint-navy);
+            letter-spacing: 0.8px;
+        }
+        .filter-reset {
+            font-size: 10px;
+            color: var(--mint-blue);
+            cursor: pointer;
+            background: none;
             border: none;
+        }
+        .filter-reset:hover { text-decoration: underline; }
+
+        .filter-section {
+            margin-bottom: 20px;
+        }
+        .filter-section-title {
+            font-size: 9px;
+            font-weight: 600;
+            color: var(--mint-gray-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+        }
+
+        /* Filter Controls */
+        .filter-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .filter-chip {
+            padding: 6px 12px;
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--mint-gray-light);
+            background: var(--surface-base);
+            border: 1px solid var(--border-subtle);
             border-radius: 4px;
             cursor: pointer;
             transition: all 0.15s;
-            margin-left: auto;
         }
-        .verify-btn:hover { background: #4a8a6c; }
-        .verify-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .filter-chip:hover { border-color: var(--mint-gray); color: var(--mint-white); }
+        .filter-chip.active {
+            background: var(--mint-blue);
+            border-color: var(--mint-blue);
+            color: white;
+        }
+
+        .filter-range {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .filter-range-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .filter-range-label {
+            font-size: 10px;
+            color: var(--mint-gray-light);
+            width: 40px;
+        }
+        .filter-input {
+            flex: 1;
+            padding: 8px 10px;
+            font-size: 11px;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--mint-white);
+            background: var(--surface-base);
+            border: 1px solid var(--border-subtle);
+            border-radius: 4px;
+            outline: none;
+        }
+        .filter-input:focus { border-color: var(--mint-blue); }
+        .filter-input::placeholder { color: var(--mint-gray); }
+
+        .filter-slider {
+            width: 100%;
+            margin: 8px 0;
+            accent-color: var(--mint-blue);
+        }
+        .filter-slider-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 9px;
+            color: var(--mint-gray-light);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .filter-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+            cursor: pointer;
+        }
+        .filter-toggle-switch {
+            width: 36px;
+            height: 20px;
+            background: var(--mint-gray);
+            border-radius: 10px;
+            position: relative;
+            transition: background 0.2s;
+        }
+        .filter-toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.2s;
+        }
+        .filter-toggle.active .filter-toggle-switch {
+            background: var(--mint-blue);
+        }
+        .filter-toggle.active .filter-toggle-switch::after {
+            transform: translateX(16px);
+        }
+        .filter-toggle-label {
+            font-size: 11px;
+            color: var(--mint-white);
+        }
+
+        /* Presets */
+        .filter-presets {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border-subtle);
+        }
+        .filter-preset {
+            padding: 10px 12px;
+            font-size: 11px;
+            color: var(--mint-gray-light);
+            background: var(--surface-base);
+            border: 1px solid var(--border-subtle);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.15s;
+            text-align: left;
+        }
+        .filter-preset:hover { border-color: var(--mint-gray); color: var(--mint-white); }
+        .filter-preset-name { font-weight: 600; color: var(--mint-white); display: block; margin-bottom: 2px; }
+        .filter-preset-desc { font-size: 10px; }
+
+        /* Results Panel */
+        .results-panel {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Results Header */
+        .results-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 20px;
+            background: var(--surface-card);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+        .results-count {
+            font-size: 12px;
+            color: var(--mint-white);
+        }
+        .results-count span {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--mint-blue);
+            font-weight: 600;
+        }
+        .active-filters {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .active-filter-tag {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            font-size: 10px;
+            color: var(--mint-white);
+            background: rgba(0, 122, 255, 0.2);
+            border: 1px solid var(--mint-blue);
+            border-radius: 4px;
+        }
+        .active-filter-tag button {
+            background: none;
+            border: none;
+            color: var(--mint-gray-light);
+            cursor: pointer;
+            font-size: 12px;
+            line-height: 1;
+        }
+        .active-filter-tag button:hover { color: var(--mint-white); }
+
+        /* Invoice Table */
+        .invoice-table-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0;
+        }
+        .invoice-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .invoice-table th {
+            position: sticky;
+            top: 0;
+            padding: 10px 16px;
+            text-align: left;
+            font-size: 9px;
+            font-weight: 600;
+            color: var(--mint-gray-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: var(--surface-card);
+            border-bottom: 1px solid var(--border-subtle);
+            z-index: 10;
+        }
+        .invoice-table th.sortable { cursor: pointer; }
+        .invoice-table th.sortable:hover { color: var(--mint-white); }
+        .invoice-table th .sort-icon { margin-left: 4px; opacity: 0.5; }
+        .invoice-table th.sorted .sort-icon { opacity: 1; }
+
+        .invoice-table td {
+            padding: 12px 16px;
+            font-size: 12px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+        .invoice-table tr { cursor: pointer; transition: background 0.1s; }
+        .invoice-table tr:hover { background: var(--surface-elevated); }
+        .invoice-table tr.selected { background: rgba(0, 122, 255, 0.1); }
+
+        .inv-id { font-family: 'JetBrains Mono', monospace; font-weight: 500; color: var(--mint-white); }
+        .inv-obligor {
+            display: inline-block;
+            padding: 2px 8px;
+            font-size: 10px;
+            font-weight: 600;
+            border-radius: 2px;
+        }
+        .inv-obligor.tjx { background: rgba(59, 130, 246, 0.15); color: #60A5FA; }
+        .inv-obligor.olli { background: rgba(16, 185, 129, 0.15); color: #34D399; }
+        .inv-obligor.rost { background: rgba(245, 158, 11, 0.15); color: #FBBF24; }
+        .inv-obligor.burl { background: rgba(139, 92, 246, 0.15); color: #A78BFA; }
+
+        .inv-amount { font-family: 'JetBrains Mono', monospace; text-align: right; }
+        .inv-days { font-family: 'JetBrains Mono', monospace; text-align: center; }
+        .inv-days.urgent { color: var(--mint-red); }
+        .inv-days.soon { color: var(--mint-amber); }
+        .inv-days.normal { color: var(--mint-green); }
+
+        .inv-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 8px;
+            font-size: 9px;
+            font-weight: 600;
+            border-radius: 2px;
+        }
+        .inv-status.matched { background: rgba(5, 150, 105, 0.15); color: var(--mint-green); }
+        .inv-status.pending { background: rgba(217, 119, 6, 0.15); color: var(--mint-amber); }
+        .inv-status.disputed { background: rgba(220, 38, 38, 0.15); color: var(--mint-red); }
+
+        .inv-score {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .inv-score.high { color: var(--mint-green); }
+        .inv-score.medium { color: var(--mint-amber); }
+        .inv-score.low { color: var(--mint-red); }
+
+        .inv-action {
+            padding: 6px 12px;
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--mint-blue);
+            background: rgba(0, 122, 255, 0.1);
+            border: 1px solid var(--mint-blue);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .inv-action:hover { background: var(--mint-blue); color: white; }
+
+        /* Summary Bar */
+        .summary-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 20px;
+            background: var(--surface-card);
+            border-top: 1px solid var(--border-subtle);
+        }
+        .summary-metrics {
+            display: flex;
+            gap: 32px;
+        }
+        .summary-metric {
+            text-align: center;
+        }
+        .summary-metric-label {
+            font-size: 9px;
+            color: var(--mint-gray-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .summary-metric-value {
+            font-size: 18px;
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--mint-white);
+        }
+        .summary-actions {
+            display: flex;
+            gap: 12px;
+        }
+        .summary-btn {
+            padding: 10px 20px;
+            font-size: 11px;
+            font-weight: 600;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .summary-btn.primary {
+            background: var(--mint-blue);
+            color: white;
+            border: none;
+        }
+        .summary-btn.primary:hover { background: #0066DD; }
+        .summary-btn.secondary {
+            background: transparent;
+            color: var(--mint-white);
+            border: 1px solid var(--mint-gray);
+        }
+        .summary-btn.secondary:hover { background: var(--surface-elevated); }
     </style>
 </head>
 <body>
@@ -320,371 +445,438 @@
                 <a href="agents.html" class="nav-tab">Agents</a>
             </div>
         </div>
-        <div class="nav-right">
-            <span id="clock"></span>
-        </div>
     </nav>
 
-    <!-- Demo Narration -->
-    <div class="demo-narration">
-        <div class="demo-narration-icon">◉</div>
-        <div class="demo-narration-content">
-            <div class="demo-narration-row">
-                <span class="demo-label">LIVE DATA</span>
-                <span class="demo-text">Pulled directly from retailer Oracle ERP via OData API. Supplier confirmation via AS2/EDI.</span>
-            </div>
-            <div class="demo-narration-row secondary">
-                <span class="demo-source">Source: Oracle ERP Cloud → MINT Extraction Agent → Triple Verification</span>
-            </div>
-        </div>
-        <div class="demo-narration-stats">
-            <div class="demo-stat">
-                <span class="demo-stat-value">3</span>
-                <span class="demo-stat-label">Sources</span>
-            </div>
-            <div class="demo-stat">
-                <span class="demo-stat-value">13</span>
-                <span class="demo-stat-label">Checks</span>
-            </div>
-            <div class="demo-stat">
-                <span class="demo-stat-value">36ms</span>
-                <span class="demo-stat-label">Latency</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- Main Content -->
-    <div class="main-container">
-        <div class="production-container">
-            <!-- Obligor Tabs -->
-            <div class="obligor-tabs">
-                <button class="obligor-tab active" data-obligor="tjx" onclick="selectObligor('tjx')">
-                    <span class="obligor-ticker">TJX</span>
-                    <span class="obligor-rating">A-</span>
-                </button>
-                <button class="obligor-tab" data-obligor="olli" onclick="selectObligor('olli')">
-                    <span class="obligor-ticker">OLLI</span>
-                    <span class="obligor-rating">BBB+</span>
-                </button>
-                <button class="obligor-tab" data-obligor="rost" onclick="selectObligor('rost')">
-                    <span class="obligor-ticker">ROST</span>
-                    <span class="obligor-rating">BBB+</span>
-                </button>
+    <!-- Main Layout -->
+    <div class="main-layout">
+        <!-- Filter Panel -->
+        <div class="filter-panel">
+            <div class="filter-header">
+                <span class="filter-title">Filter Invoices</span>
+                <button class="filter-reset" onclick="resetFilters()">Reset All</button>
             </div>
 
-            <div class="production-grid">
-                <!-- Invoice List -->
-                <div class="invoice-list-panel">
-                    <div class="panel-header">
-                        <span class="panel-title">Pending Invoices</span>
-                        <span class="invoice-count" id="invoice-count">0</span>
-                    </div>
-                    <div class="invoice-list" id="invoice-list"></div>
+            <!-- Obligor Filter -->
+            <div class="filter-section">
+                <div class="filter-section-title">Obligor</div>
+                <div class="filter-chips" id="obligorChips">
+                    <div class="filter-chip active" data-value="all" onclick="toggleObligor(this)">All</div>
+                    <div class="filter-chip" data-value="tjx" onclick="toggleObligor(this)">TJX</div>
+                    <div class="filter-chip" data-value="olli" onclick="toggleObligor(this)">OLLI</div>
+                    <div class="filter-chip" data-value="rost" onclick="toggleObligor(this)">ROST</div>
+                    <div class="filter-chip" data-value="burl" onclick="toggleObligor(this)">BURL</div>
                 </div>
+            </div>
 
-                <!-- Comparison Panel -->
-                <div class="comparison-panel">
-                    <div class="comparison-header">
-                        <div class="source-column">
-                            <div class="source-icon oracle">◉</div>
-                            <div class="source-label">RETAILER ERP</div>
-                            <div class="source-system" id="erp-system-label">Oracle ERP Cloud</div>
-                            <div class="source-method">OData API</div>
-                        </div>
-                        <div class="source-column center">
-                            <div class="verification-badge" id="verification-badge">
-                                <span class="verification-icon">⟷</span>
-                                <span class="verification-text" id="match-status-text">SELECT INVOICE</span>
-                            </div>
-                        </div>
-                        <div class="source-column">
-                            <div class="source-icon supplier">◉</div>
-                            <div class="source-label">SUPPLIER EDI</div>
-                            <div class="source-system">AS2 / SFTP</div>
-                            <div class="source-method">EDI 810</div>
-                        </div>
+            <!-- Amount Range -->
+            <div class="filter-section">
+                <div class="filter-section-title">Amount Range</div>
+                <div class="filter-range">
+                    <div class="filter-range-row">
+                        <span class="filter-range-label">Min</span>
+                        <input type="text" class="filter-input" id="amountMin" placeholder="$0" oninput="applyFilters()">
                     </div>
+                    <div class="filter-range-row">
+                        <span class="filter-range-label">Max</span>
+                        <input type="text" class="filter-input" id="amountMax" placeholder="$500,000" oninput="applyFilters()">
+                    </div>
+                </div>
+            </div>
 
-                    <div class="comparison-grid" id="comparison-grid">
-                        <div class="comparison-empty">
-                            Select an invoice to view triple verification
-                        </div>
-                    </div>
+            <!-- Days to Due -->
+            <div class="filter-section">
+                <div class="filter-section-title">Days to Due</div>
+                <input type="range" class="filter-slider" id="daysSlider" min="0" max="90" value="90" oninput="updateDaysLabel(); applyFilters()">
+                <div class="filter-slider-labels">
+                    <span>0</span>
+                    <span id="daysValue">≤90 days</span>
+                    <span>90</span>
+                </div>
+            </div>
 
-                    <div class="verification-summary" id="verification-summary">
-                        <div class="verification-source">
-                            <div class="source-check oracle">
-                                <span class="check-icon" id="erp-check">○</span>
-                                <span class="check-label">ERP Confirmed</span>
-                            </div>
-                            <div class="source-detail" id="erp-detail">Invoice exists in Oracle AP module</div>
-                        </div>
-                        <div class="verification-source">
-                            <div class="source-check supplier">
-                                <span class="check-icon" id="edi-check">○</span>
-                                <span class="check-label">Supplier Confirmed</span>
-                            </div>
-                            <div class="source-detail" id="edi-detail">EDI 810 received via AS2</div>
-                        </div>
-                        <div class="verification-source">
-                            <div class="source-check procurement">
-                                <span class="check-icon" id="procurement-check">○</span>
-                                <span class="check-label">Procurement Verified</span>
-                            </div>
-                            <div class="source-detail" id="procurement-detail">PO → GR → INV chain intact</div>
-                        </div>
-                    </div>
+            <!-- ReIM Status -->
+            <div class="filter-section">
+                <div class="filter-section-title">ReIM Status</div>
+                <div class="filter-chips" id="statusChips">
+                    <div class="filter-chip active" data-value="all" onclick="toggleStatus(this)">All</div>
+                    <div class="filter-chip" data-value="matched" onclick="toggleStatus(this)">Matched</div>
+                    <div class="filter-chip" data-value="pending" onclick="toggleStatus(this)">Pending</div>
+                    <div class="filter-chip" data-value="disputed" onclick="toggleStatus(this)">Disputed</div>
+                </div>
+            </div>
 
-                    <div class="verification-footer">
-                        <div class="invoice-meta" id="invoice-meta">
-                            <div class="meta-item">
-                                <span class="meta-label">Risk Score</span>
-                                <span class="meta-value" id="meta-risk">--</span>
-                            </div>
-                            <div class="meta-item">
-                                <span class="meta-label">Yield</span>
-                                <span class="meta-value accent" id="meta-yield">--</span>
-                            </div>
-                            <div class="meta-item">
-                                <span class="meta-label">Hash</span>
-                                <span class="meta-value mono" id="meta-hash">--</span>
-                            </div>
-                        </div>
-                        <button class="verify-btn" id="verify-btn" onclick="openCheckpoint()" disabled>
-                            RUN CHECKPOINT
-                        </button>
+            <!-- Risk Score -->
+            <div class="filter-section">
+                <div class="filter-section-title">Min Risk Score</div>
+                <input type="range" class="filter-slider" id="scoreSlider" min="0" max="100" value="0" oninput="updateScoreLabel(); applyFilters()">
+                <div class="filter-slider-labels">
+                    <span>0%</span>
+                    <span id="scoreValue">≥0%</span>
+                    <span>100%</span>
+                </div>
+            </div>
+
+            <!-- Toggles -->
+            <div class="filter-section">
+                <div class="filter-section-title">Verification</div>
+                <div class="filter-toggle active" id="toggleROG" onclick="toggleFilter('toggleROG')">
+                    <div class="filter-toggle-switch"></div>
+                    <span class="filter-toggle-label">ROG Confirmed</span>
+                </div>
+                <div class="filter-toggle active" id="togglePO" onclick="toggleFilter('togglePO')">
+                    <div class="filter-toggle-switch"></div>
+                    <span class="filter-toggle-label">PO Matched</span>
+                </div>
+                <div class="filter-toggle" id="toggleFunded" onclick="toggleFilter('toggleFunded')">
+                    <div class="filter-toggle-switch"></div>
+                    <span class="filter-toggle-label">Never Funded</span>
+                </div>
+            </div>
+
+            <!-- Presets -->
+            <div class="filter-presets">
+                <div class="filter-section-title">Quick Presets</div>
+                <button class="filter-preset" onclick="applyPreset('highValue')">
+                    <span class="filter-preset-name">High Value Ready</span>
+                    <span class="filter-preset-desc">≥$50K, Matched, Score ≥85%</span>
+                </button>
+                <button class="filter-preset" onclick="applyPreset('urgent')">
+                    <span class="filter-preset-name">Urgent (≤7 Days)</span>
+                    <span class="filter-preset-desc">Due soon, all statuses</span>
+                </button>
+                <button class="filter-preset" onclick="applyPreset('cleanOnly')">
+                    <span class="filter-preset-name">Clean Only</span>
+                    <span class="filter-preset-desc">Matched, ROG, PO, Score ≥90%</span>
+                </button>
+                <button class="filter-preset" onclick="applyPreset('review')">
+                    <span class="filter-preset-name">Needs Review</span>
+                    <span class="filter-preset-desc">Pending or Disputed</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Results Panel -->
+        <div class="results-panel">
+            <!-- Results Header -->
+            <div class="results-header">
+                <div class="results-count">
+                    Showing <span id="filteredCount">0</span> of <span id="totalCount">0</span> invoices
+                </div>
+                <div class="active-filters" id="activeFilters"></div>
+            </div>
+
+            <!-- Invoice Table -->
+            <div class="invoice-table-container">
+                <table class="invoice-table">
+                    <thead>
+                        <tr>
+                            <th class="sortable" onclick="sortBy('id')">Invoice ID <span class="sort-icon">↕</span></th>
+                            <th class="sortable" onclick="sortBy('obligor')">Obligor <span class="sort-icon">↕</span></th>
+                            <th class="sortable" onclick="sortBy('supplier')">Supplier <span class="sort-icon">↕</span></th>
+                            <th class="sortable" onclick="sortBy('po')">PO Ref <span class="sort-icon">↕</span></th>
+                            <th class="sortable" onclick="sortBy('amount')" style="text-align: right;">Amount <span class="sort-icon">↕</span></th>
+                            <th class="sortable" onclick="sortBy('days')" style="text-align: center;">Days <span class="sort-icon">↕</span></th>
+                            <th>Status</th>
+                            <th class="sortable" onclick="sortBy('score')">Score <span class="sort-icon">↕</span></th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="invoiceBody"></tbody>
+                </table>
+            </div>
+
+            <!-- Summary Bar -->
+            <div class="summary-bar">
+                <div class="summary-metrics">
+                    <div class="summary-metric">
+                        <div class="summary-metric-label">Total Value</div>
+                        <div class="summary-metric-value" id="totalValue">$0</div>
                     </div>
+                    <div class="summary-metric">
+                        <div class="summary-metric-label">Avg Score</div>
+                        <div class="summary-metric-value" id="avgScore">0%</div>
+                    </div>
+                    <div class="summary-metric">
+                        <div class="summary-metric-label">Weighted Avg Days</div>
+                        <div class="summary-metric-value" id="avgDays">0</div>
+                    </div>
+                    <div class="summary-metric">
+                        <div class="summary-metric-label">Selected</div>
+                        <div class="summary-metric-value" id="selectedCount">0</div>
+                    </div>
+                </div>
+                <div class="summary-actions">
+                    <button class="summary-btn secondary" onclick="exportFiltered()">Export CSV</button>
+                    <button class="summary-btn primary" onclick="verifySelected()">Verify Selected</button>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Invoice Data
-        const obligorData = {
-            tjx: {
-                name: 'TJX HG',
-                ticker: 'TJX',
-                rating: 'A-',
-                erpSystem: 'Oracle ERP Cloud',
-                invoices: [
-                    { id: 'INV-77807', amount: 188700.00, supplier: 'SUP-2267', supplierName: 'Metro Freight LLC', status: 'ready', risk: 95, yield: 7.60, hash: '0x33774408', shipDate: '2026-01-10', deliveryConfirmed: true, oracle: { po: 'PO-88421', gr: 'GR-443222', amount: 188700.00, terms: 'NET 45', due: '2026-01-29' }, supplier_data: { po: 'PO-88421', gr: 'GR-443222', amount: 188700.00, terms: 'NET 45', due: '2026-01-29' }},
-                    { id: 'INV-77808', amount: 245670.00, supplier: 'SUP-2267', supplierName: 'Metro Freight LLC', status: 'ready', risk: 95, yield: 7.40, hash: '0x00AABBCC', shipDate: '2026-01-12', deliveryConfirmed: true, oracle: { po: 'PO-88422', gr: 'GR-443223', amount: 245670.00, terms: 'NET 45', due: '2026-01-31' }, supplier_data: { po: 'PO-88422', gr: 'GR-443223', amount: 245670.00, terms: 'NET 45', due: '2026-01-31' }}
-                ]
-            },
-            olli: {
-                name: 'OLLI',
-                ticker: 'OLLI',
-                rating: 'BBB+',
-                erpSystem: 'SAP S/4HANA',
-                invoices: [
-                    { id: 'INV-77809', amount: 423500.00, supplier: 'SUP-3378', supplierName: 'Apex Logistics Inc', status: 'ready', risk: 96, yield: 7.20, hash: '0x55AABBCC', shipDate: '2026-01-08', deliveryConfirmed: true, oracle: { po: 'PO-92301', gr: 'GR-501122', amount: 423500.00, terms: 'NET 45', due: '2026-02-01' }, supplier_data: { po: 'PO-92301', gr: 'GR-501122', amount: 423500.00, terms: 'NET 45', due: '2026-02-01' }},
-                    { id: 'INV-77810', amount: 356780.00, supplier: 'SUP-3378', supplierName: 'Apex Logistics Inc', status: 'ready', risk: 95, yield: 7.40, hash: '0x77DDEEFF', shipDate: '2026-01-09', deliveryConfirmed: true, oracle: { po: 'PO-92302', gr: 'GR-501123', amount: 356780.00, terms: 'NET 30', due: '2026-01-30' }, supplier_data: { po: 'PO-92302', gr: 'GR-501123', amount: 356780.00, terms: 'NET 30', due: '2026-01-30' }},
-                    { id: 'INV-77811', amount: 289340.00, supplier: 'SUP-3378', supplierName: 'Apex Logistics Inc', status: 'mismatch', risk: 94, yield: 7.60, hash: '0x99001122', shipDate: '2026-01-11', deliveryConfirmed: true, oracle: { po: 'PO-92303', gr: 'GR-501124', amount: 289340.00, terms: 'NET 45', due: '2026-02-05' }, supplier_data: { po: 'PO-92303', gr: 'GR-501124', amount: 289840.00, terms: 'NET 45', due: '2026-02-05' }},
-                    { id: 'INV-77812', amount: 312890.00, supplier: 'SUP-3378', supplierName: 'Apex Logistics Inc', status: 'ready', risk: 95, yield: 7.30, hash: '0x22DDEEFF', shipDate: '2026-01-13', deliveryConfirmed: true, oracle: { po: 'PO-92304', gr: 'GR-501125', amount: 312890.00, terms: 'NET 45', due: '2026-02-08' }, supplier_data: { po: 'PO-92304', gr: 'GR-501125', amount: 312890.00, terms: 'NET 45', due: '2026-02-08' }},
-                    { id: 'INV-77813', amount: 267890.00, supplier: 'SUP-3378', supplierName: 'Apex Logistics Inc', status: 'pending', risk: 94, yield: 7.50, hash: '0xCC8899BB', shipDate: '2026-01-14', deliveryConfirmed: true, oracle: { po: 'PO-92305', gr: 'GR-501126', amount: 267890.00, terms: 'NET 30', due: '2026-02-10' }, supplier_data: { po: 'PO-92305', gr: 'GR-501126', amount: 267890.00, terms: 'NET 30', due: '2026-02-10' }}
-                ]
-            },
-            rost: {
-                name: 'ROST',
-                ticker: 'ROST',
-                rating: 'BBB+',
-                erpSystem: 'Oracle ERP Cloud',
-                invoices: [
-                    { id: 'INV-77814', amount: 567800.00, supplier: 'SUP-4489', supplierName: 'National Freight Systems', status: 'ready', risk: 99, yield: 6.20, hash: '0xBB334455', shipDate: '2026-01-07', deliveryConfirmed: true, oracle: { po: 'PO-75401', gr: 'GR-601001', amount: 567800.00, terms: 'NET 30', due: '2026-01-31' }, supplier_data: { po: 'PO-75401', gr: 'GR-601001', amount: 567800.00, terms: 'NET 30', due: '2026-01-31' }},
-                    { id: 'INV-77815', amount: 489230.00, supplier: 'SUP-4489', supplierName: 'National Freight Systems', status: 'ready', risk: 98, yield: 6.40, hash: '0xDD556677', shipDate: '2026-01-09', deliveryConfirmed: true, oracle: { po: 'PO-75402', gr: 'GR-601002', amount: 489230.00, terms: 'NET 45', due: '2026-02-08' }, supplier_data: { po: 'PO-75402', gr: 'GR-601002', amount: 489230.00, terms: 'NET 45', due: '2026-02-08' }},
-                    { id: 'INV-77816', amount: 398450.00, supplier: 'SUP-4489', supplierName: 'National Freight Systems', status: 'ready', risk: 98, yield: 6.50, hash: '0x44001133', shipDate: '2026-01-11', deliveryConfirmed: true, oracle: { po: 'PO-75403', gr: 'GR-601003', amount: 398450.00, terms: 'NET 30', due: '2026-02-01' }, supplier_data: { po: 'PO-75403', gr: 'GR-601003', amount: 398450.00, terms: 'NET 30', due: '2026-02-01' }},
-                    { id: 'INV-77817', amount: 523100.00, supplier: 'SUP-4489', supplierName: 'National Freight Systems', status: 'ready', risk: 99, yield: 6.30, hash: '0xAA667799', shipDate: '2026-01-13', deliveryConfirmed: true, oracle: { po: 'PO-75404', gr: 'GR-601004', amount: 523100.00, terms: 'NET 45', due: '2026-02-12' }, supplier_data: { po: 'PO-75404', gr: 'GR-601004', amount: 523100.00, terms: 'NET 45', due: '2026-02-12' }}
-                ]
-            }
+        // Sample invoice data
+        const invoices = [
+            { id: 'INV-2024-847291', obligor: 'tjx', supplier: 'Acme Textiles', po: 'PO-2024-003847', amount: 127450, days: 14, status: 'matched', score: 94, rog: true, poMatch: true, funded: false },
+            { id: 'INV-2024-847292', obligor: 'tjx', supplier: 'Global Fabrics', po: 'PO-2024-003848', amount: 89200, days: 21, status: 'matched', score: 91, rog: true, poMatch: true, funded: false },
+            { id: 'INV-2024-847293', obligor: 'olli', supplier: 'Pacific Trading', po: 'PO-2024-005123', amount: 234500, days: 7, status: 'matched', score: 88, rog: true, poMatch: true, funded: false },
+            { id: 'INV-2024-847294', obligor: 'olli', supplier: 'Delta Imports', po: 'PO-2024-005124', amount: 67800, days: 28, status: 'pending', score: 72, rog: false, poMatch: true, funded: false },
+            { id: 'INV-2024-847295', obligor: 'rost', supplier: 'Summit Goods', po: 'PO-2024-008901', amount: 445000, days: 3, status: 'matched', score: 96, rog: true, poMatch: true, funded: false },
+            { id: 'INV-2024-847296', obligor: 'rost', supplier: 'Metro Supply', po: 'PO-2024-008902', amount: 156700, days: 35, status: 'matched', score: 89, rog: true, poMatch: true, funded: true },
+            { id: 'INV-2024-847297', obligor: 'burl', supplier: 'Prime Vendors', po: 'PO-2024-002341', amount: 78900, days: 12, status: 'disputed', score: 45, rog: true, poMatch: false, funded: false },
+            { id: 'INV-2024-847298', obligor: 'tjx', supplier: 'Eastern Mills', po: 'PO-2024-003849', amount: 312000, days: 5, status: 'matched', score: 92, rog: true, poMatch: true, funded: false },
+            { id: 'INV-2024-847299', obligor: 'olli', supplier: 'Coastal Corp', po: 'PO-2024-005125', amount: 198400, days: 18, status: 'matched', score: 87, rog: true, poMatch: true, funded: false },
+            { id: 'INV-2024-847300', obligor: 'rost', supplier: 'Alpine Goods', po: 'PO-2024-008903', amount: 542100, days: 42, status: 'pending', score: 78, rog: false, poMatch: true, funded: false },
+            { id: 'INV-2024-847301', obligor: 'burl', supplier: 'Valley Trade', po: 'PO-2024-002342', amount: 89500, days: 9, status: 'matched', score: 85, rog: true, poMatch: true, funded: false },
+            { id: 'INV-2024-847302', obligor: 'tjx', supplier: 'Harbor Imports', po: 'PO-2024-003850', amount: 267300, days: 22, status: 'matched', score: 93, rog: true, poMatch: true, funded: false },
+            { id: 'INV-2024-847303', obligor: 'olli', supplier: 'Ridge Supply', po: 'PO-2024-005126', amount: 145600, days: 31, status: 'matched', score: 90, rog: true, poMatch: true, funded: false },
+            { id: 'INV-2024-847304', obligor: 'rost', supplier: 'Central Trading', po: 'PO-2024-008904', amount: 378200, days: 6, status: 'matched', score: 95, rog: true, poMatch: true, funded: false },
+            { id: 'INV-2024-847305', obligor: 'burl', supplier: 'Western Goods', po: 'PO-2024-002343', amount: 56700, days: 45, status: 'pending', score: 68, rog: false, poMatch: true, funded: false },
+        ];
+
+        let filters = {
+            obligor: 'all',
+            status: 'all',
+            amountMin: 0,
+            amountMax: Infinity,
+            maxDays: 90,
+            minScore: 0,
+            rogConfirmed: true,
+            poMatched: true,
+            neverFunded: false
         };
 
-        let currentObligor = 'tjx';
-        let selectedInvoice = null;
+        let selectedInvoices = new Set();
+        let sortColumn = 'id';
+        let sortDirection = 'asc';
 
-        // Clock
-        function updateClock() {
-            const now = new Date();
-            document.getElementById('clock').textContent = now.toLocaleString('en-US', {
-                month: '2-digit', day: '2-digit', year: 'numeric',
-                hour: '2-digit', minute: '2-digit', second: '2-digit',
-                hour12: true, timeZoneName: 'short'
-            });
-        }
-        setInterval(updateClock, 1000);
-        updateClock();
-
-        // Select Obligor
-        function selectObligor(obligorId) {
-            currentObligor = obligorId;
-            selectedInvoice = null;
-
-            document.querySelectorAll('.obligor-tab').forEach(tab => {
-                tab.classList.toggle('active', tab.dataset.obligor === obligorId);
-            });
-
-            document.getElementById('erp-system-label').textContent = obligorData[currentObligor].erpSystem;
-            renderInvoiceList();
-            clearComparison();
+        function toggleObligor(chip) {
+            document.querySelectorAll('#obligorChips .filter-chip').forEach(c => c.classList.remove('active'));
+            chip.classList.add('active');
+            filters.obligor = chip.dataset.value;
+            applyFilters();
         }
 
-        // Render Invoice List
-        function renderInvoiceList() {
-            const invoices = obligorData[currentObligor].invoices;
-            document.getElementById('invoice-count').textContent = invoices.length;
+        function toggleStatus(chip) {
+            document.querySelectorAll('#statusChips .filter-chip').forEach(c => c.classList.remove('active'));
+            chip.classList.add('active');
+            filters.status = chip.dataset.value;
+            applyFilters();
+        }
 
-            document.getElementById('invoice-list').innerHTML = invoices.map((inv, idx) => `
-                <div class="invoice-item ${inv.status === 'mismatch' ? 'mismatch' : ''} ${inv.status === 'pending' ? 'pending' : ''}"
-                     data-index="${idx}" onclick="selectInvoice(${idx})">
-                    <div class="invoice-item-left">
-                        <div class="invoice-id">${inv.id}</div>
-                        <div class="invoice-supplier">${inv.supplier}</div>
-                    </div>
-                    <div class="invoice-item-right">
-                        <div class="invoice-amount">$${inv.amount.toLocaleString('en-US', {minimumFractionDigits: 0})}</div>
-                        <div class="invoice-status-badge ${inv.status}">${inv.status === 'ready' ? 'READY' : inv.status === 'mismatch' ? 'MISMATCH' : 'PENDING'}</div>
-                    </div>
-                </div>
+        function toggleFilter(id) {
+            const toggle = document.getElementById(id);
+            toggle.classList.toggle('active');
+            if (id === 'toggleROG') filters.rogConfirmed = toggle.classList.contains('active');
+            if (id === 'togglePO') filters.poMatched = toggle.classList.contains('active');
+            if (id === 'toggleFunded') filters.neverFunded = toggle.classList.contains('active');
+            applyFilters();
+        }
+
+        function updateDaysLabel() {
+            const val = document.getElementById('daysSlider').value;
+            document.getElementById('daysValue').textContent = `≤${val} days`;
+            filters.maxDays = parseInt(val);
+        }
+
+        function updateScoreLabel() {
+            const val = document.getElementById('scoreSlider').value;
+            document.getElementById('scoreValue').textContent = `≥${val}%`;
+            filters.minScore = parseInt(val);
+        }
+
+        function parseAmount(str) {
+            if (!str) return null;
+            return parseFloat(str.replace(/[$,]/g, '')) || null;
+        }
+
+        function applyFilters() {
+            filters.amountMin = parseAmount(document.getElementById('amountMin').value) || 0;
+            filters.amountMax = parseAmount(document.getElementById('amountMax').value) || Infinity;
+            renderTable();
+            updateActiveFilters();
+        }
+
+        function resetFilters() {
+            filters = {
+                obligor: 'all',
+                status: 'all',
+                amountMin: 0,
+                amountMax: Infinity,
+                maxDays: 90,
+                minScore: 0,
+                rogConfirmed: true,
+                poMatched: true,
+                neverFunded: false
+            };
+            document.querySelectorAll('.filter-chip').forEach(c => {
+                c.classList.toggle('active', c.dataset.value === 'all');
+            });
+            document.getElementById('amountMin').value = '';
+            document.getElementById('amountMax').value = '';
+            document.getElementById('daysSlider').value = 90;
+            document.getElementById('scoreSlider').value = 0;
+            document.getElementById('toggleROG').classList.add('active');
+            document.getElementById('togglePO').classList.add('active');
+            document.getElementById('toggleFunded').classList.remove('active');
+            updateDaysLabel();
+            updateScoreLabel();
+            applyFilters();
+        }
+
+        function applyPreset(preset) {
+            resetFilters();
+            switch(preset) {
+                case 'highValue':
+                    document.getElementById('amountMin').value = '$50,000';
+                    document.getElementById('scoreSlider').value = 85;
+                    filters.amountMin = 50000;
+                    filters.minScore = 85;
+                    toggleStatus(document.querySelector('#statusChips [data-value="matched"]'));
+                    break;
+                case 'urgent':
+                    document.getElementById('daysSlider').value = 7;
+                    filters.maxDays = 7;
+                    break;
+                case 'cleanOnly':
+                    document.getElementById('scoreSlider').value = 90;
+                    filters.minScore = 90;
+                    toggleStatus(document.querySelector('#statusChips [data-value="matched"]'));
+                    break;
+                case 'review':
+                    document.getElementById('toggleROG').classList.remove('active');
+                    filters.rogConfirmed = false;
+                    break;
+            }
+            updateDaysLabel();
+            updateScoreLabel();
+            applyFilters();
+        }
+
+        function getFilteredInvoices() {
+            return invoices.filter(inv => {
+                if (filters.obligor !== 'all' && inv.obligor !== filters.obligor) return false;
+                if (filters.status !== 'all' && inv.status !== filters.status) return false;
+                if (inv.amount < filters.amountMin) return false;
+                if (inv.amount > filters.amountMax) return false;
+                if (inv.days > filters.maxDays) return false;
+                if (inv.score < filters.minScore) return false;
+                if (filters.rogConfirmed && !inv.rog) return false;
+                if (filters.poMatched && !inv.poMatch) return false;
+                if (filters.neverFunded && inv.funded) return false;
+                return true;
+            });
+        }
+
+        function sortBy(column) {
+            if (sortColumn === column) {
+                sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                sortColumn = column;
+                sortDirection = 'asc';
+            }
+            renderTable();
+        }
+
+        function renderTable() {
+            let filtered = getFilteredInvoices();
+
+            // Sort
+            filtered.sort((a, b) => {
+                let aVal = a[sortColumn];
+                let bVal = b[sortColumn];
+                if (typeof aVal === 'string') aVal = aVal.toLowerCase();
+                if (typeof bVal === 'string') bVal = bVal.toLowerCase();
+                if (aVal < bVal) return sortDirection === 'asc' ? -1 : 1;
+                if (aVal > bVal) return sortDirection === 'asc' ? 1 : -1;
+                return 0;
+            });
+
+            const tbody = document.getElementById('invoiceBody');
+            tbody.innerHTML = filtered.map(inv => `
+                <tr class="${selectedInvoices.has(inv.id) ? 'selected' : ''}"
+                    onclick="toggleSelect('${inv.id}')"
+                    data-invoice='${JSON.stringify(inv)}'>
+                    <td class="inv-id">${inv.id}</td>
+                    <td><span class="inv-obligor ${inv.obligor}">${inv.obligor.toUpperCase()}</span></td>
+                    <td>${inv.supplier}</td>
+                    <td class="mono" style="font-size: 11px; color: var(--mint-gray-light);">${inv.po}</td>
+                    <td class="inv-amount">$${inv.amount.toLocaleString()}</td>
+                    <td class="inv-days ${inv.days <= 7 ? 'urgent' : inv.days <= 14 ? 'soon' : 'normal'}">${inv.days}</td>
+                    <td><span class="inv-status ${inv.status}">${inv.status.toUpperCase()}</span></td>
+                    <td class="inv-score ${inv.score >= 85 ? 'high' : inv.score >= 70 ? 'medium' : 'low'}">${inv.score}%</td>
+                    <td><button class="inv-action" onclick="event.stopPropagation(); verifyInvoice('${inv.id}', '${inv.po}', '${inv.obligor}')">Verify</button></td>
+                </tr>
             `).join('');
+
+            // Update counts
+            document.getElementById('filteredCount').textContent = filtered.length;
+            document.getElementById('totalCount').textContent = invoices.length;
+
+            // Update summary
+            const totalValue = filtered.reduce((sum, inv) => sum + inv.amount, 0);
+            const avgScore = filtered.length ? (filtered.reduce((sum, inv) => sum + inv.score, 0) / filtered.length).toFixed(0) : 0;
+            const avgDays = filtered.length ? (filtered.reduce((sum, inv) => sum + inv.days * inv.amount, 0) / totalValue).toFixed(1) : 0;
+
+            document.getElementById('totalValue').textContent = '$' + (totalValue / 1000000).toFixed(2) + 'M';
+            document.getElementById('avgScore').textContent = avgScore + '%';
+            document.getElementById('avgDays').textContent = avgDays;
         }
 
-        // Select Invoice
-        function selectInvoice(index) {
-            const invoices = obligorData[currentObligor].invoices;
-            selectedInvoice = invoices[index];
-
-            document.querySelectorAll('.invoice-item').forEach((item, idx) => {
-                item.classList.toggle('selected', idx === index);
-            });
-
-            renderComparison();
+        function toggleSelect(id) {
+            if (selectedInvoices.has(id)) {
+                selectedInvoices.delete(id);
+            } else {
+                selectedInvoices.add(id);
+            }
+            document.getElementById('selectedCount').textContent = selectedInvoices.size;
+            renderTable();
         }
 
-        // Clear Comparison
-        function clearComparison() {
-            document.getElementById('comparison-grid').innerHTML = `
-                <div class="comparison-empty">Select an invoice to view triple verification</div>
-            `;
-            document.getElementById('verification-badge').className = 'verification-badge';
-            document.getElementById('match-status-text').textContent = 'SELECT INVOICE';
-            document.getElementById('verification-summary').style.display = 'none';
-            document.getElementById('invoice-meta').style.display = 'none';
-            document.getElementById('verify-btn').disabled = true;
-        }
-
-        // Render Comparison
-        function renderComparison() {
-            if (!selectedInvoice) return;
-
-            const oracle = selectedInvoice.oracle;
-            const supplier = selectedInvoice.supplier_data;
-            const hasMismatch = selectedInvoice.status === 'mismatch';
-
-            const categories = [
-                { label: 'DOCUMENT IDENTITY', fields: [
-                    { label: 'Invoice Number', oracle: selectedInvoice.id, supplier: selectedInvoice.id },
-                    { label: 'Supplier ID', oracle: selectedInvoice.supplier, supplier: selectedInvoice.supplier }
-                ]},
-                { label: 'PROCUREMENT CHAIN', fields: [
-                    { label: 'PO Reference', oracle: oracle.po, supplier: supplier.po },
-                    { label: 'Goods Receipt', oracle: oracle.gr, supplier: supplier.gr }
-                ]},
-                { label: 'FINANCIAL DATA', fields: [
-                    { label: 'Amount', oracle: '$' + oracle.amount.toLocaleString('en-US', {minimumFractionDigits: 2}), supplier: '$' + supplier.amount.toLocaleString('en-US', {minimumFractionDigits: 2}) },
-                    { label: 'Currency', oracle: 'USD', supplier: 'USD' }
-                ]},
-                { label: 'PAYMENT TERMS', fields: [
-                    { label: 'Terms', oracle: oracle.terms, supplier: supplier.terms },
-                    { label: 'Due Date', oracle: oracle.due, supplier: supplier.due }
-                ]},
-                { label: 'LOGISTICS', fields: [
-                    { label: 'Ship Date', oracle: selectedInvoice.shipDate, supplier: selectedInvoice.shipDate },
-                    { label: 'Delivery', oracle: selectedInvoice.deliveryConfirmed ? 'CONFIRMED' : 'PENDING', supplier: selectedInvoice.deliveryConfirmed ? 'CONFIRMED' : 'PENDING' }
-                ]}
-            ];
-
-            let totalFields = 0;
-            let matchedFields = 0;
-            let gridHTML = '';
-
-            categories.forEach(cat => {
-                gridHTML += `<div class="comparison-category"><div class="category-label">${cat.label}</div></div>`;
-                cat.fields.forEach(f => {
-                    const isMatch = f.oracle === f.supplier;
-                    totalFields++;
-                    if (isMatch) matchedFields++;
-
-                    gridHTML += `
-                        <div class="comparison-row">
-                            <div class="comparison-cell oracle">
-                                <div class="comparison-field">${f.label}</div>
-                                <div class="comparison-value">${f.oracle}</div>
-                            </div>
-                            <div class="comparison-cell match-cell">
-                                <div class="match-indicator ${isMatch ? 'pass' : 'fail'}">${isMatch ? '✓' : '✗'}</div>
-                            </div>
-                            <div class="comparison-cell supplier">
-                                <div class="comparison-field">${f.label}</div>
-                                <div class="comparison-value">${f.supplier}</div>
-                            </div>
-                        </div>
-                    `;
-                });
-            });
-
-            document.getElementById('comparison-grid').innerHTML = gridHTML;
-
-            // Update verification badge
-            const badge = document.getElementById('verification-badge');
-            badge.className = 'verification-badge ' + (hasMismatch ? 'mismatch' : 'matched');
-            document.getElementById('match-status-text').textContent = hasMismatch ? `${matchedFields}/${totalFields} MISMATCH` : `${matchedFields}/${totalFields} MATCH`;
-
-            // Show verification summary
-            document.getElementById('verification-summary').style.display = 'grid';
-
-            const erpCheck = document.getElementById('erp-check');
-            const ediCheck = document.getElementById('edi-check');
-            const procurementCheck = document.getElementById('procurement-check');
-
-            erpCheck.textContent = '✓';
-            erpCheck.classList.add('confirmed');
-            document.getElementById('erp-detail').textContent = `Invoice ${selectedInvoice.id} exists in ${obligorData[currentObligor].erpSystem}`;
-
-            ediCheck.textContent = hasMismatch ? '!' : '✓';
-            ediCheck.classList.toggle('confirmed', !hasMismatch);
-            document.getElementById('edi-detail').textContent = hasMismatch ? 'Amount discrepancy: $500.00' : `EDI 810 confirmed by ${selectedInvoice.supplier}`;
-
-            procurementCheck.textContent = '✓';
-            procurementCheck.classList.add('confirmed');
-            document.getElementById('procurement-detail').textContent = `${oracle.po} → ${oracle.gr} → ${selectedInvoice.id}`;
-
-            // Show invoice meta
-            document.getElementById('invoice-meta').style.display = 'flex';
-            document.getElementById('meta-risk').textContent = selectedInvoice.risk;
-            document.getElementById('meta-yield').textContent = selectedInvoice.yield.toFixed(2) + '%';
-            document.getElementById('meta-hash').textContent = selectedInvoice.hash;
-
-            // Enable verify button
-            document.getElementById('verify-btn').disabled = false;
-        }
-
-        // Open Checkpoint with invoice data
-        function openCheckpoint() {
-            if (!selectedInvoice) return;
-
-            const params = new URLSearchParams({
-                po: selectedInvoice.oracle.po,
-                inv: selectedInvoice.id,
-                obligor: obligorData[currentObligor].ticker,
-                supplier: selectedInvoice.supplier,
-                amount: selectedInvoice.amount
-            });
-
+        function verifyInvoice(id, po, obligor) {
+            const params = new URLSearchParams({ inv: id, po: po, obligor: obligor });
             window.location.href = `checkpoint.html?${params.toString()}`;
         }
 
-        // Initialize
-        renderInvoiceList();
+        function verifySelected() {
+            if (selectedInvoices.size === 0) {
+                alert('Select invoices first');
+                return;
+            }
+            const ids = Array.from(selectedInvoices).join(',');
+            window.location.href = `checkpoint.html?batch=${ids}`;
+        }
+
+        function exportFiltered() {
+            const filtered = getFilteredInvoices();
+            const csv = [
+                ['Invoice ID', 'Obligor', 'Supplier', 'PO Ref', 'Amount', 'Days', 'Status', 'Score'].join(','),
+                ...filtered.map(inv => [inv.id, inv.obligor.toUpperCase(), inv.supplier, inv.po, inv.amount, inv.days, inv.status, inv.score + '%'].join(','))
+            ].join('\n');
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'mint_tape_export.csv';
+            a.click();
+        }
+
+        function updateActiveFilters() {
+            const tags = [];
+            if (filters.obligor !== 'all') tags.push(`Obligor: ${filters.obligor.toUpperCase()}`);
+            if (filters.status !== 'all') tags.push(`Status: ${filters.status}`);
+            if (filters.amountMin > 0) tags.push(`Min: $${filters.amountMin.toLocaleString()}`);
+            if (filters.amountMax < Infinity) tags.push(`Max: $${filters.amountMax.toLocaleString()}`);
+            if (filters.maxDays < 90) tags.push(`≤${filters.maxDays} days`);
+            if (filters.minScore > 0) tags.push(`Score ≥${filters.minScore}%`);
+
+            document.getElementById('activeFilters').innerHTML = tags.map(t =>
+                `<span class="active-filter-tag">${t}</span>`
+            ).join('');
+        }
+
+        // Init
+        renderTable();
     </script>
 </body>
 </html>

@@ -86,7 +86,7 @@
         .execute-btn:hover { background: var(--surface-elevated); }
         .execute-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-        /* Main Layout: Data Panel Top Right, Log Center, Checkpoints Bottom */
+        /* Main Layout: Data Panel Top Left, Log Top Right, Checkpoints Bottom */
         .main-container {
             display: grid;
             grid-template-rows: auto 1fr;
@@ -300,7 +300,7 @@
     <div class="main-container">
         <!-- Top Row: Data Panel + Log -->
         <div class="top-row">
-            <!-- Data Panel (moved to top left) -->
+            <!-- Data Panel (top left) -->
             <div class="data-panel">
                 <div class="data-panel-header">Oracle Data Objects</div>
                 <div class="data-panel-content" id="dataContent">
@@ -541,7 +541,7 @@
             log('GET /fscmRestApi/resources/11.13.18.05/purchaseOrders/' + oracleResponses.purchaseOrder.POHeaderId, 'query');
             await delay(380);
             log('HTTP 200 | Status: CLOSED_FOR_RECEIVING', 'response');
-            log('SupplierId: ' + oracleResponses.purchaseOrder.SupplierId, 'response');
+            log('SupplierId: SUP-4421', 'response');
             log('Supplier match: YES', 'calc');
             setResult('02', 'PASS');
             log('CP02 Result: PASS', 'checkpoint');
@@ -561,8 +561,8 @@
             // CP04
             log('─── CHECKPOINT 04: Amount Validation ───', 'checkpoint');
             setActiveData('Invoice');
-            log('Invoice Amount: $' + oracleResponses.invoice.InvoiceAmount.toLocaleString(), 'calc');
-            log('PO Amount: $' + oracleResponses.purchaseOrder.TotalAmount.toLocaleString(), 'calc');
+            log('Invoice Amount: $127,450', 'calc');
+            log('PO Amount: $130,000', 'calc');
             log('Variance: -1.96% (tolerance: 5%)', 'calc');
             setResult('04', 'PASS');
             log('CP04 Result: PASS', 'checkpoint');
@@ -602,8 +602,8 @@
             setActiveData('Graph');
             log('MATCH (r:Retailer {id:"TJX"})-[p:PAYS]->(s:Supplier {id:"SUP-4421"}) RETURN p', 'query');
             await delay(400);
-            log('Edge found: ' + oracleResponses.payorGraph.invoice_count + ' invoices over 22 months', 'response');
-            log('Avg payment: ' + oracleResponses.payorGraph.actual_avg_days + ' days (stated: ' + oracleResponses.payorGraph.stated_terms + ')', 'response');
+            log('Edge found: 847 invoices over 22 months', 'response');
+            log('Avg payment: 28.4 days (stated: 30)', 'response');
             log('Dispute rate: 1.42%', 'calc');
             log('Relationship score: 94.6', 'calc');
             setResult('07', 'PASS');
@@ -673,7 +673,7 @@
             if (po || inv) {
                 const filterIndicator = document.getElementById('filterIndicator');
                 filterIndicator.classList.add('visible');
-                filterIndicator.textContent = `Filter: ${inv || po} ${obligor ? '(' + obligor + ')' : ''}`;
+                filterIndicator.textContent = `Filter: ${inv || po} ${obligor ? '(' + obligor.toUpperCase() + ')' : ''}`;
 
                 // Update Oracle data with filtered values
                 if (po) oracleResponses.purchaseOrder.POHeaderId = po;
